@@ -2,9 +2,7 @@
   transition: background 0.2s;
 }
 
-body,
-#root {
-  background: var(--backgroun d);
+body{
   color: var(--text);
   width: 100vw;
   height: 100vh;
