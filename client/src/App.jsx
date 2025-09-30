@@ -5,6 +5,7 @@ import { CssBaseline } from "@mui/material";
 import { ThemeContext } from "./app/Contexts/ThemeContext";
 import { useState } from "react";
 import { Route, Routes } from "react-router-dom";
+
 import Register from "./Components/Register";
 import AppLayout from "./Components/Layouts/AppLayout";
 import Login from "./Components/Login";
@@ -12,6 +13,7 @@ import HomePage from "./Components/HomePage";
 import SettingsPage from "./Components/Settings";
 import ChatLayout from "./Components/Layouts/ChatLayout";
 import UserPage from "./Components/User";
+import NotFound from "./Components/NotFound";
 
 function App() {
   const currentThemeName = localStorage.theme || "light";
@@ -40,7 +42,9 @@ function App() {
                 <Route path="settings" element={<SettingsPage/>} />
                 <Route path="user/:username" element={<UserPage/>} />
             </Route>
-          
+
+            <Route path="*" element={<NotFound/>} />
+
           </Routes>
       </ThemeProvider>
     </ThemeContext.Provider>

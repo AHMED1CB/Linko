@@ -10,20 +10,23 @@ import { Link } from "react-router-dom";
 import ModeNightOutlinedIcon from "@mui/icons-material/ModeNightOutlined";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import { useContext } from "react";
-import { ThemeContext }  from "../app/Contexts/ThemeContext";
-function Header() {
-    const isLoggedIn = false;
-    const { theme  , setTheme } = useContext(ThemeContext);
+import { ThemeContext } from "../app/Contexts/ThemeContext";
 
-    const toggleTheme = () => {
-        setTheme(theme === 'light' ? 'dark' : 'light')
-    }
+
+
+export default  () => {
+  const isLoggedIn = false;
+  const { theme, setTheme } = useContext(ThemeContext);
+
+  const toggleTheme = () => {
+    setTheme(theme === "light" ? "dark" : "light");
+  };
 
   return (
     <AppBar position="static">
       <Container maxWidth="xl">
         <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-          <Link to={'/'} className="logo-container">
+          <Link to={"/"} className="logo-container">
             <img src="/logo.svg" alt="AppLogo" className="logo" id="logo" />
             <Typography variant="h2">Linko</Typography>
           </Link>
@@ -64,4 +67,3 @@ function Header() {
   );
 }
 
-export default Header;

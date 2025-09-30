@@ -20,8 +20,15 @@ import {
   ExitToApp,
   Search,
 } from "@mui/icons-material";
+import { useContext } from "react";
+import { ThemeContext } from "../app/Contexts/ThemeContext";
 
 export default function SettingsPage() {
+  const { setTheme, theme } = useContext(ThemeContext);
+
+  const changeTheme = () => {
+    setTheme(theme == "dark" ? "light" : "dark");
+  };
 
   return (
     <Box
@@ -33,8 +40,6 @@ export default function SettingsPage() {
       }}
       className="setting-container"
     >
-     
-
       <Box sx={{ flex: 1, overflowY: "auto", p: { xs: 2, md: 4 } }}>
         <Box
           sx={{
@@ -52,21 +57,23 @@ export default function SettingsPage() {
           <InputBase placeholder="Search settings..." sx={{ ml: 1, flex: 1 }} />
         </Box>
 
-
         <Slide direction="up" in mountOnEnter unmountOnExit>
           <Paper variant="outlined" sx={{ mb: 3, borderRadius: 3 }}>
-            <Typography variant="subtitle2" sx={{ px: 2, pt: 2, fontWeight: "bold" }}>
+            <Typography
+              variant="subtitle2"
+              sx={{ px: 2, pt: 2, fontWeight: "bold" }}
+            >
               Account
             </Typography>
             <List>
-              <ListItem  sx={{ "&:hover": { bgcolor: "action.hover" } }}>
+              <ListItem sx={{ "&:hover": { bgcolor: "action.hover" } }}>
                 <ListItemIcon>
                   <AccountCircle color="primary" />
                 </ListItemIcon>
                 <ListItemText primary="Profile" secondary="Edit account info" />
               </ListItem>
               <Divider />
-              <ListItem button sx={{ "&:hover": { bgcolor: "action.hover" } }}>
+              <ListItem sx={{ "&:hover": { bgcolor: "action.hover" } }}>
                 <ListItemIcon>
                   <Lock color="secondary" />
                 </ListItemIcon>
@@ -81,7 +88,10 @@ export default function SettingsPage() {
 
         <Slide direction="up" in mountOnEnter unmountOnExit>
           <Paper variant="outlined" sx={{ mb: 3, borderRadius: 3 }}>
-            <Typography variant="subtitle2" sx={{ px: 2, pt: 2, fontWeight: "bold" }}>
+            <Typography
+              variant="subtitle2"
+              sx={{ px: 2, pt: 2, fontWeight: "bold" }}
+            >
               Preferences
             </Typography>
             <List>
@@ -89,7 +99,10 @@ export default function SettingsPage() {
                 <ListItemIcon>
                   <Notifications color="primary" />
                 </ListItemIcon>
-                <ListItemText primary="Notifications" secondary="Enable alerts" />
+                <ListItemText
+                  primary="Notifications"
+                  secondary="Enable alerts"
+                />
                 <Switch edge="end" />
               </ListItem>
               <Divider />
@@ -98,7 +111,11 @@ export default function SettingsPage() {
                   <DarkMode color="secondary" />
                 </ListItemIcon>
                 <ListItemText primary="Dark Mode" />
-                <Switch edge="end" />
+                <Switch
+                  edge="end"
+                  checked={theme == "dark"}
+                  onChange={changeTheme}
+                />
               </ListItem>
             </List>
           </Paper>
@@ -106,18 +123,21 @@ export default function SettingsPage() {
 
         <Slide direction="up" in mountOnEnter unmountOnExit>
           <Paper variant="outlined" sx={{ mb: 3, borderRadius: 3 }}>
-            <Typography variant="subtitle2" sx={{ px: 2, pt: 2, fontWeight: "bold" }}>
+            <Typography
+              variant="subtitle2"
+              sx={{ px: 2, pt: 2, fontWeight: "bold" }}
+            >
               App
             </Typography>
             <List>
-              <ListItem button sx={{ "&:hover": { bgcolor: "action.hover" } }}>
+              <ListItem sx={{ "&:hover": { bgcolor: "action.hover" } }}>
                 <ListItemIcon>
                   <Language color="primary" />
                 </ListItemIcon>
                 <ListItemText primary="Language" secondary="English" />
               </ListItem>
               <Divider />
-              <ListItem button sx={{ "&:hover": { bgcolor: "action.hover" } }}>
+              <ListItem sx={{ "&:hover": { bgcolor: "action.hover" } }}>
                 <ListItemIcon>
                   <ExitToApp color="error" />
                 </ListItemIcon>
@@ -127,7 +147,6 @@ export default function SettingsPage() {
           </Paper>
         </Slide>
       </Box>
-
     </Box>
   );
 }
