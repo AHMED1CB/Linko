@@ -54,17 +54,34 @@ The application follows a **client–server** architecture:
 
 ## Getting Started
 
-### Prerequisites
-
-- Node.js (v16+ recommended)  
+## Prerequisites
+- Node.js v14 or later  
 - npm or yarn  
-- MongoDB (Atlas or local)  
-- (Optional) `dotenv` for managing environment variables  
+- MongoDB (local or Atlas)  
 
-### Installation
-
-Clone the repository:
-
+## Installation
 ```bash
 git clone https://github.com/AHMED1CB/Linko.git
 cd Linko
+```
+# Backend
+```bash
+cd server
+npm install
+```
+```bash
+# Frontend
+cd ../client
+npm install
+```
+---
+# Start backend
+```bash
+cd server
+npm run dev
+```
+# Start frontend
+```bash
+cd ../client
+npm start
+```
