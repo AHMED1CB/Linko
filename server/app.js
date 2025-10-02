@@ -9,6 +9,7 @@ import bodyParser from "body-parser";
 
 import connect from './Mongose/Connection.js';
 import Auth from './Routes/Auth.js'
+import { errorHandler } from './Middleware/ErrorHandler.js';
 
 
 
@@ -16,7 +17,6 @@ dotenv.config();
 
 // Connecto To Database
 connect()
-
 
 // EXPRESS
 const app = express();
@@ -27,7 +27,11 @@ app.use(helmet())
 
 
 // Auth Routes
+
 app.use('/auth' , Auth)
+app.use(errorHandler)
+
+
 // End Auth Routes
 
 

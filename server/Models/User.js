@@ -14,9 +14,11 @@ const userSchema = new mongoose.Schema({
 
   bio: {
     type: String,
+    default: "",
   },
   photo: {
     type: String, // Image Path
+    default: "",
   },
 
   email: {

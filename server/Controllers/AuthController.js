@@ -1,4 +1,8 @@
-import { loginSchema, registerSchema } from "../Validations/Auth.js";
+import {
+  loginSchema,
+  registerSchema,
+  updateSchema,
+} from "../Validations/Auth.js";
 import User from "../Models/User.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -22,7 +26,7 @@ export default class AuthController {
         email: req.body.email,
         password: await bcrypt.hash(req.body.password, 8),
         bio: null,
-        photo: null
+        photo: null,
       };
 
       // Check if User Exists
@@ -108,12 +112,47 @@ export default class AuthController {
       error: "",
       status: "Success",
       data: {
-        user: await User.findOne({ _id: req.user.id }).select([
-          "username",
-          "email",
-          "bio",
-          "photo",
-        ]),
+        user: await User.findOne({ _id: req.user.id }, { password: 0 }),
+      },
+    });
+  }
+
+  static async UpdateProfile(req, res) {
+    const userId = req.user.id;
+
+    const { error } = updateSchema.validate(req.body);
+    if (error || !req.body) {
+      return res.status(400).json({
+        message: "Invalid Profile Data",
+        error: error ? error.details[0].message : "Cannot Find Data To Update",
+        status: "Fail",
+      });
+    }
+
+    const toUpdate = ["username", "name", "bio"];
+    const data = {};
+
+    toUpdate.forEach((item) => {
+      if (req.body[item]) {
+        data[item] = req.body[item];
+      }
+    });
+
+    if (req["file"]) {
+      data["photo"] = req.file.filename;
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(userId, data, {
+      new: true,
+      select: "-password",
+    });
+
+    return res.status(200).json({
+      status: "Success",
+      message: "User Details Updeted Successfully",
+      error: null,
+      data: {
+        user: updatedUser,
       },
     });
   }
