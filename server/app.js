@@ -10,8 +10,10 @@ import bodyParser from "body-parser";
 import connect from "./Mongose/Connection.js";
 import Auth from "./Routes/Auth.js";
 import Users from "./Routes/Users.js";
+import Requests from "./Routes/Requests.js";
 
 import { errorHandler } from "./Middleware/ErrorHandler.js";
+import authToken from "./Middleware/Auth.js";
 
 dotenv.config();
 
@@ -29,6 +31,7 @@ app.use(helmet());
 
 app.use("/auth", Auth);
 app.use("/users", Users);
+app.use("/requests", authToken ,  Requests);
 
 app.use(errorHandler);
 
