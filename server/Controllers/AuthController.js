@@ -7,6 +7,7 @@ import User from "../Models/User.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
+
 export default class AuthController {
   static async Register(req, res) {
     const { error } = registerSchema.validate(req.body);

@@ -14,4 +14,6 @@ router.get("/profile", authToken, AuthController.GetProfile);
 router.put("/profile/update", uploadPhoto.single('photo') ,  authToken, AuthController.UpdateProfile);
 
 
+
+
 export default router;
