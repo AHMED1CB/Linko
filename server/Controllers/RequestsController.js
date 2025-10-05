@@ -52,4 +52,21 @@ export default class RequestController {
       status: "Success",
     });
   }
+
+  static async ShowRecivedRequests(req, res) {
+    const currentUser = req.user.id;
+
+    let requests = await Request.find({
+      to: currentUser,
+    }).populate('from' , '-password').sort({createdAt: -1});
+
+    return res.status(200).json({
+      message: "",
+      error: null,
+      status: "Success",
+      data: {
+        requests,
+      },
+    });
+  }
 }
