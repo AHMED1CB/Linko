@@ -31,7 +31,7 @@ app.use(helmet());
 
 app.use("/auth", Auth);
 app.use("/users", Users);
-app.use("/requests", authToken ,  Requests);
+app.use("/requests", authToken, Requests);
 
 app.use(errorHandler);
 
@@ -41,9 +41,7 @@ app.use(errorHandler);
 let server = http.createServer();
 const io = new Server(server);
 
-
-io.on("connection", (socket) => {
-});
+io.on("connection", (socket) => {});
 
 app.listen(process.env.PORT || 5000, () => {
   console.log("Server Started");

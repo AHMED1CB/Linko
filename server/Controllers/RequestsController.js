@@ -1,3 +1,4 @@
+import Friend from "../Models/Friend.js";
 import Request from "../Models/Request.js";
 import User from "../Models/User.js";
 
@@ -58,7 +59,9 @@ export default class RequestController {
 
     let requests = await Request.find({
       to: currentUser,
-    }).populate('from' , '-password').sort({createdAt: -1});
+    })
+      .populate("from", "-password")
+      .sort({ createdAt: -1 });
 
     return res.status(200).json({
       message: "",
@@ -67,6 +70,61 @@ export default class RequestController {
       data: {
         requests,
       },
+    });
+  }
+
+  static async Accept(req, res) {
+    const { userId: requestSender } = req.params;
+    const currentUserId = req.user.id;
+
+    // Check if Request Exists;
+
+    const isRequestExists = await Request.exists({
+      from: requestSender,
+      to: currentUserId,
+    });
+
+    if (!isRequestExists) {
+      return res.status(400).json({
+        message: "There is No Requests Sent From This User",
+        error: "No Request Found",
+        status: "Fail",
+      });
+    }
+
+    // Delete Request And Add to friends
+
+    await Request.deleteOne({
+      from: requestSender,
+      to: currentUserId,
+    });
+
+    // insert friend
+
+    await Friend.updateOne(
+      {
+        user: requestSender,
+      },
+      {
+        $addToSet: { friends: currentUserId },
+      },
+      { upsert: true }
+    );
+
+    await Friend.updateOne(
+      {
+        user: currentUserId,
+      },
+      {
+        $addToSet: { friends: requestSender },
+      },
+      { upsert: true }
+    );
+
+    return res.status(201).json({
+      message: "Friend Request Accepted",
+      error: null,
+      status: "Success",
     });
   }
 }
