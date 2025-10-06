@@ -1,1 +1,3 @@
 ./test
+./server/.ENV
+./client/.env
