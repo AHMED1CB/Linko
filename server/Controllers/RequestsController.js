@@ -127,4 +127,39 @@ export default class RequestController {
       status: "Success",
     });
   }
+
+  static async Reject(req, res) {
+
+    const { userId: requestSender } = req.params;
+    const currentUserId = req.user.id;
+
+    // Check if Request Exists;
+
+    const isRequestExists = await Request.exists({
+      from: requestSender,
+      to: currentUserId,
+    });
+
+    if (!isRequestExists) {
+      return res.status(400).json({
+        message: "There is No Requests Sent From This User",
+        error: "No Request Found",
+        status: "Fail",
+      });
+    }
+
+    // Delete Request And Add to friends
+
+    await Request.deleteOne({
+      from: requestSender,
+      to: currentUserId,
+    });
+
+
+    return res.status(200).json({
+      message: "Request Rejected Successfully",
+      error: null,
+      status: "Success",
+    });
+  }
 }
