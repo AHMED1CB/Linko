@@ -15,6 +15,7 @@ import Friends from "./Routes/Friends.js";
 
 import { errorHandler } from "./Middleware/ErrorHandler.js";
 import authToken from "./Middleware/Auth.js";
+import SocketController from "./Controllers/SocketController.js";
 
 dotenv.config();
 
@@ -40,11 +41,10 @@ app.use(errorHandler);
 // End Auth Routes
 
 // SOCKET IO
-let server = http.createServer();
-const io = new Server(server);
+let server = http.createServer(app);
+const ioManager = new SocketController(server);
 
-io.on("connection", (socket) => {});
 
-app.listen(process.env.PORT || 5000, () => {
+server.listen(process.env.PORT || 5000, () => {
   console.log("Server Started");
 });

@@ -1,4 +1,4 @@
-import { ThemeProvider} from "@mui/material/styles";
+import { ThemeProvider } from "@mui/material/styles";
 import themes from "./app/Theme";
 import "./assets/css/main.css";
 import { CssBaseline } from "@mui/material";
@@ -30,22 +30,21 @@ function App() {
       value={{ theme: themeName, setTheme: setCurrentTheme }}
     >
       <ThemeProvider theme={themes[themeName]}>
-        <CssBaseline/>
-          <Routes>
-            <Route path="/auth" element={<AppLayout/>}>
-              <Route path="register" element={<Register/>}/>
-              <Route path="login" element={<Login/>}/>
-            </Route>
+        <CssBaseline />
+        <Routes>
+          <Route path="/auth" element={<AppLayout />}>
+            <Route path="register" element={<Register />} />
+            <Route path="login" element={<Login />} />
+          </Route>
 
-            <Route path="/" element={<ChatLayout/>}>
-                <Route index element={<HomePage/>} />
-                <Route path="settings" element={<SettingsPage/>} />
-                <Route path="user/:username" element={<UserPage/>} />
-            </Route>
+          <Route path="/" element={<ChatLayout />}>
+            <Route index element={<HomePage />} />
+            <Route path="settings" element={<SettingsPage />} />
+            <Route path="user/:username" element={<UserPage />} />
+          </Route>
 
-            <Route path="*" element={<NotFound/>} />
-
-          </Routes>
+          <Route path="*" element={<NotFound />} />
+        </Routes>
       </ThemeProvider>
     </ThemeContext.Provider>
   );
