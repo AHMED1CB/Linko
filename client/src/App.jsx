@@ -14,6 +14,7 @@ import SettingsPage from "./Components/Settings";
 import ChatLayout from "./Components/Layouts/ChatLayout";
 import UserPage from "./Components/User";
 import NotFound from "./Components/NotFound";
+import ChatUser from "./Components/ChatUser";
 
 function App() {
   const currentThemeName = localStorage.theme || "light";
@@ -41,6 +42,8 @@ function App() {
             <Route index element={<HomePage />} />
             <Route path="settings" element={<SettingsPage />} />
             <Route path="user/:username" element={<UserPage />} />
+
+            <Route path="/user/:username/chat" element={<ChatUser />} />
           </Route>
 
           <Route path="*" element={<NotFound />} />

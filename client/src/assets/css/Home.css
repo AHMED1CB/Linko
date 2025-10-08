@@ -198,3 +198,31 @@
 .message-input .MuiOutlinedInput-root {
   border-radius: 24px;
 }
+
+.welcome-msg {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin: auto;
+  width: 80%;
+}
+
+.welcome-msg img {
+  max-width: 150px;
+  object-fit: cover;
+}
+
+.welcome-msg h2 {
+  font-size: 30px;
+  margin-top: 30px;
+}
+
+@media (max-width: 992px) {
+  .chat-side-full {
+    width: 100% !important;
+  }
+  .welcome-msg{
+    display: none;
+  }
+}

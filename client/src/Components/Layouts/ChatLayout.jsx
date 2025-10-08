@@ -14,7 +14,7 @@ export default () => {
   
   if(currentLocation == -1){
     locations.forEach((loc , i) => {
-      if (location.includes(loc) && location.startsWith(loc)){
+      if (location.includes(loc) && location.startsWith(loc) && !location.endsWith('/chat')){
         currentLocation = i
       }
     })

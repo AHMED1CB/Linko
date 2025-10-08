@@ -9,13 +9,22 @@ export default class SocketController {
             }
         });
 
+        this.events = [
+            {
+                name: 'register',
+                action: 'RegisterNewUser'
+            }
+        ]
+
+
         this.users = new Map();
 
-        console.log('Socket Started')
 
         this.io.on('connection', (socket) => {
 
-            socket.on('register', (data) => this.RegisterNewUser(data, socket))
+            this.events.forEach(event => {
+                socket.on(event.name, (data) => this[event.name](data.socket))
+            })
 
         })
 

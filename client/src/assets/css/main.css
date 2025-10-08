@@ -90,3 +90,15 @@ a:not(header a) {
     display: flex;
     flex-direction: column;
 }
+
+@media (max-width:992px) {
+
+  .chat-contents{
+    width: 100% !important;
+  }
+
+  .sidebar{
+    display: none !important
+  }
+
+}

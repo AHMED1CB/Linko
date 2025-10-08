@@ -10,6 +10,31 @@ import jwt from "jsonwebtoken";
 
 export default class AuthController {
   static async Register(req, res) {
+
+    // Check if User Exists First
+
+    const data = {
+      username: req.body.username,
+      name: req.body.username,
+      email: req.body.email,
+      password: await bcrypt.hash(req.body.password, 8),
+      bio: null,
+      photo: null,
+    };
+
+
+    const checkUser = await User.exists({
+      $or: [{ email: data.email }, { username: data.username }],
+    });
+
+    if (checkUser) {
+      return res.status(400).json({
+        status: "Fail",
+        message: "User Has Already been Registerd",
+        error: "User Has Already been Registerd",
+      });
+    }
+
     const { error } = registerSchema.validate(req.body);
 
     if (error || !req.body) {
@@ -20,41 +45,18 @@ export default class AuthController {
           ? error.details[0].message
           : "Invalid Data Or User Already Registerd",
       });
-    } else {
-      const data = {
-        username: req.body.username,
-        name: req.body.username,
-        email: req.body.email,
-        password: await bcrypt.hash(req.body.password, 8),
-        bio: null,
-        photo: null,
-      };
-
-      // Check if User Exists
-
-      const checkUser = await User.exists({
-        username: data.username,
-        $or: [{ email: data.email }],
-      });
-
-      if (checkUser) {
-        return res.status(400).json({
-          status: "Fail",
-          message: "User Has Already been Registerd",
-          error: "User Has Already been Registerd",
-        });
-      }
-
-      // Insert User Details
-      const newUser = new User(data);
-      await newUser.save();
-
-      return res.status(200).json({
-        status: "Success",
-        message: "User Registerd Successfully",
-        error: null,
-      });
     }
+
+
+
+    // Insert User Details
+    await User.create(data);
+
+    return res.status(200).json({
+      status: "Success",
+      message: "User Registerd Successfully",
+      error: null,
+    });
   }
 
   static async Login(req, res) {
@@ -62,16 +64,6 @@ export default class AuthController {
       username: req.body.username,
       password: req.body.password,
     };
-
-    const { error } = loginSchema.validate(data);
-
-    if (error) {
-      return res.status(400).json({
-        status: "Fail",
-        message: "Invalid Loign Data",
-        error: error.details[0].message,
-      });
-    }
 
     const targetUser = await User.findOne({
       username: data.username,
@@ -85,6 +77,17 @@ export default class AuthController {
       });
     }
 
+    const { error } = loginSchema.validate(data);
+
+    if (error) {
+      return res.status(400).json({
+        status: "Fail",
+        message: "Invalid Loign Data",
+        error: error.details[0].message,
+      });
+    }
+
+
     let verfied = await bcrypt.compare(data.password, targetUser.password);
 
     if (!verfied) {
@@ -96,9 +99,10 @@ export default class AuthController {
     }
     const payload = { id: targetUser.id, username: targetUser.username };
 
-    const token = jwt.sign(payload, process.env.APP_SECRET);
+    const token = jwt.sign(payload, process.env.APP_SECRET, { expiresIn: '2d' });
+
     return res.status(200).json({
-      message: "User Logged In Successfully",
+      message: "User Login Successfully",
       status: "Success",
       error: null,
       data: {
@@ -113,7 +117,7 @@ export default class AuthController {
       error: "",
       status: "Success",
       data: {
-        user: await User.findOne({ _id: req.user.id }, { password: 0 }),
+        user: await User.findById(req.user.id).select('-password'),
       },
     });
   }
@@ -122,6 +126,7 @@ export default class AuthController {
     const userId = req.user.id;
 
     const { error } = updateSchema.validate(req.body);
+
     if (error || !req.body) {
       return res.status(400).json({
         message: "Invalid Profile Data",

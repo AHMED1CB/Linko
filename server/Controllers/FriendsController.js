@@ -5,19 +5,16 @@ export default class FriendsController {
     static async GetUserFriends(req, res) {
         const userId = req.user.id;
 
-
         const friends = await Friend.findOne({ user: userId }).populate({
-            path: 'friends',
-            select: '-password'
+            path: "friends",
+            select: "-password"
         });
-
-
 
         return res.status(200).json({
             message: "",
-            error: '',
+            error: "",
             data: {
-                friends
+                friends : friends.friends
             }
         })
     }
@@ -25,37 +22,19 @@ export default class FriendsController {
     static async DeleteFriend(req, res) {
 
         const { friendId: targetFriendId } = req.params;
+
         const currentId = req.user.id;
 
-        const userFriends = await Friend.findOne({ user: currentId });
-
-        if (targetFriendId == currentId) {
-            return res.status(400).json({
-                message: 'Cannot Remove Yourself From Friends List',
-                error: 'Invalid Friend Id',
-                status: "Fail"
-            });
-        }
-
-        const userHasFriendsList = await Friend.exists({ user: currentId });
-
-        if (!userHasFriendsList) {
-            return res.status(400).json({
-                message: 'You Dont Have Friends List',
-                error: 'Invalid Friends List',
-                status: "Fail"
-            });
-        }
-
+        const userFriends = await Friend.findOne({ user: currentId }) ?? [];
 
         const isFriend = userFriends.friends.some((id) => {
             return (id.toString() === targetFriendId)
         })
 
-        if (!isFriend) {
+        if (!isFriend || targetFriendId == currentId) {
             return res.status(400).json({
-                message: 'This Friend Id is Not in Your Friends List',
-                error: 'Cannot Find Friend With this id',
+                message: "Invalid Friend Id",
+                error: "Cannot Find Friend With this Id",
                 status: "Fail"
             });
         }
@@ -70,7 +49,6 @@ export default class FriendsController {
         })
 
 
-
         await Friend.updateOne({ user: targetFriendId }, {
             $pull: {
                 friends: currentId
@@ -78,7 +56,7 @@ export default class FriendsController {
         })
 
         return res.status(200).json({
-            message: 'Friend Deleted Successfully',
+            message: "Friend Deleted Successfully",
             error: null,
             status: "Success"
         });

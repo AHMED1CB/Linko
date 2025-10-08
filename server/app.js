@@ -29,21 +29,19 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 app.use(helmet());
 
-// Auth Routes
+// Routes
 
 app.use("/auth", Auth);
 app.use("/users", Users);
 app.use("/requests", authToken, Requests);
 app.use("/friends", authToken, Friends);
 
+// Error Handler 
 app.use(errorHandler);
-
-// End Auth Routes
 
 // SOCKET IO
 let server = http.createServer(app);
 const ioManager = new SocketController(server);
-
 
 server.listen(process.env.PORT || 5000, () => {
   console.log("Server Started");
