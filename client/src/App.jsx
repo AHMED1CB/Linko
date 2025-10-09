@@ -15,7 +15,9 @@ import ChatLayout from "./Components/Layouts/ChatLayout";
 import UserPage from "./Components/User";
 import NotFound from "./Components/NotFound";
 import ChatUser from "./Components/ChatUser";
-
+import { Provider as StoreProvider } from "react-redux";
+import { Store } from "./app/Redux/Store";
+import { LoaderProvider } from "./app/Contexts/LoaderContext.jsx";
 function App() {
   const currentThemeName = localStorage.theme || "light";
 
@@ -30,25 +32,29 @@ function App() {
     <ThemeContext.Provider
       value={{ theme: themeName, setTheme: setCurrentTheme }}
     >
-      <ThemeProvider theme={themes[themeName]}>
-        <CssBaseline />
-        <Routes>
-          <Route path="/auth" element={<AppLayout />}>
-            <Route path="register" element={<Register />} />
-            <Route path="login" element={<Login />} />
-          </Route>
+      <LoaderProvider>
+        <ThemeProvider theme={themes[themeName]}>
+          <StoreProvider store={Store}>
+            <CssBaseline />
+            <Routes>
+              <Route path="/auth" element={<AppLayout />}>
+                <Route path="register" element={<Register />} />
+                <Route path="login" element={<Login />} />
+              </Route>
 
-          <Route path="/" element={<ChatLayout />}>
-            <Route index element={<HomePage />} />
-            <Route path="settings" element={<SettingsPage />} />
-            <Route path="user/:username" element={<UserPage />} />
+              <Route path="/" element={<ChatLayout />}>
+                <Route index element={<HomePage />} />
+                <Route path="settings" element={<SettingsPage />} />
+                <Route path="user/:username" element={<UserPage />} />
 
-            <Route path="/user/:username/chat" element={<ChatUser />} />
-          </Route>
+                <Route path="/user/:username/chat" element={<ChatUser />} />
+              </Route>
 
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </ThemeProvider>
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </StoreProvider>
+        </ThemeProvider>
+      </LoaderProvider>
     </ThemeContext.Provider>
   );
 }

@@ -1,8 +1,68 @@
-import { TextField, Button, Box, Typography, Container } from "@mui/material";
-import { Link } from "react-router-dom";
+import {
+  TextField,
+  Button,
+  Box,
+  Typography,
+  Container,
+  Collapse,
+  Alert,
+} from "@mui/material";
+import { Link, useNavigate } from "react-router-dom";
 import PasswordField from "./Mui/PasswordField";
+import { registerSchema } from "../app/Validations/Auth";
+import { useState } from "react";
+import { useLoader } from "../app/Contexts/LoaderContext";
+import { useDispatch } from "react-redux";
+import { RegisterUser } from "../app/Redux/Features/Auth/AuthServices.js";
 
 function Register() {
+  let initialData = {
+    username: "",
+    name: "",
+    email: "",
+    password: "",
+    passwordConfirmation: "",
+  };
+  const [data, setData] = useState(initialData);
+  const [alert, setAlert] = useState({ show: false, text: "" });
+  const { showLoader, hideLoader } = useLoader();
+  const dispatch = useDispatch();
+  const go = useNavigate();
+
+  // Register Funtion
+  const tryToRegister = async () => {
+    const parse = registerSchema.safeParse(data);
+
+    if (!parse.success) {
+      const error = parse.error.issues[0].message;
+      setAlert({ show: true, text: error });
+      return;
+    }
+
+    setAlert({ show: false, text: "" });
+
+    try {
+      showLoader();
+      await dispatch(
+        RegisterUser({
+          username: data.username,
+          name: data.name,
+          email: data.email,
+          password: data.password,
+        })
+      ).unwrap();
+      setData(initialData);
+      go("/auth/login");
+    } catch (error) {
+      setAlert({
+        show: true,
+        text: error.response?.data?.message || "Something Went Wrong",
+      });
+    } finally {
+      hideLoader();
+    }
+  };
+
   return (
     <Container maxWidth="sm">
       <Box
@@ -21,19 +81,40 @@ function Register() {
             Create New Account
           </Typography>
         </Box>
+        <Collapse in={alert.show}>
+          <Alert
+            severity="error"
+            onClose={() => setAlert({ ...alert, show: false })}
+            variant="outlined"
+          >
+            {alert.text}
+          </Alert>
+        </Collapse>
 
         <form>
+          <TextField
+            label="Username"
+            variant="outlined"
+            fullWidth
+            margin="normal"
+            onChange={() => setData({ ...data, username: event.target.value })}
+            value={data.username}
+          />
           <TextField
             label="Full Name"
             variant="outlined"
             fullWidth
             margin="normal"
+            onChange={() => setData({ ...data, name: event.target.value })}
+            value={data.name}
           />
           <TextField
             label="Email"
             variant="outlined"
             fullWidth
             margin="normal"
+            onChange={() => setData({ ...data, email: event.target.value })}
+            value={data.email}
           />
           <PasswordField
             label="Password"
@@ -41,6 +122,8 @@ function Register() {
             variant="outlined"
             fullWidth
             margin="normal"
+            onChange={() => setData({ ...data, password: event.target.value })}
+            value={data.password}
           />
           <PasswordField
             label="Confirm Password"
@@ -48,8 +131,18 @@ function Register() {
             variant="outlined"
             fullWidth
             margin="normal"
+            onChange={() =>
+              setData({ ...data, passwordConfirmation: event.target.value })
+            }
+            value={data.passwordConfirmation}
           />
-          <Button variant="contained" color="primary" fullWidth sx={{ mt: 3 }}>
+          <Button
+            onClick={tryToRegister}
+            variant="contained"
+            color="primary"
+            fullWidth
+            sx={{ mt: 3 }}
+          >
             Create Account
           </Button>
           <Link to="/auth/login">Already Have An Account? Login</Link>
