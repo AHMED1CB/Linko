@@ -18,6 +18,9 @@ const AuthSlice = createSlice({
                 if (action.payload.request.status === 401) {
                     Cookie.delete('authorization');
                     location.href = '/auth/login'
+                }else{
+                    alert('Something Went Wrong Please Try Again Later')
+                    location.reload()
                 }
             })
 

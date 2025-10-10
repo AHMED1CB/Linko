@@ -29,7 +29,7 @@ const LoginUser = createAsyncThunk('auth/login', async (data, { rejectWithValue 
 
 
 
-const GetUserProfile = createAsyncThunk('auth/profile', async (data, { rejectWithValue }) => {
+const GetUserProfile = createAsyncThunk('auth/profile', async (_, { rejectWithValue }) => {
     try {
 
         const authToken = Cookie.get('authorization');

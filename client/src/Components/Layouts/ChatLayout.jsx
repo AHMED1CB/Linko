@@ -8,25 +8,19 @@ import { AuthProvider } from "../../app/Contexts/AuthContext";
 
 export default () => {
   const go = useNavigate();
-
   const { pathname: location } = useLocation();
-  const locations = ["/", "/user/", "/settings"];
+  const locations = ["/", "/profile", "/settings"];
   let currentLocation = locations.indexOf(location);
 
   if (currentLocation == -1) {
     locations.forEach((loc, i) => {
-      if (
-        location.includes(loc) &&
-        location.startsWith(loc) &&
-        !location.endsWith("/chat")
-      ) {
+      if (location.includes(loc) && location.startsWith(loc)) {
         currentLocation = i;
       }
     });
   }
 
   const [nav, setNav] = useState(currentLocation);
-
   return (
     <AuthProvider>
       <Box className="main-container">
@@ -54,7 +48,7 @@ export default () => {
           <BottomNavigationAction
             label="Profile"
             icon={<Person />}
-            onClick={() => go("/user/ahmed1cb")}
+            onClick={() => go("/profile")}
           />
           <BottomNavigationAction
             label="Settings"

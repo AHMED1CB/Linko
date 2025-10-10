@@ -23,7 +23,7 @@ export const AuthProvider = ({ children }) => {
     getUser();
   }, [dispatch]);
 
-  return <AuthContext.Provider value={user}>{children}</AuthContext.Provider>;
+  return user && <AuthContext.Provider value={user}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => useContext(AuthContext);
