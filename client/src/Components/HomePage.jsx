@@ -16,7 +16,7 @@ const HomePage = () => {
       }}
     >
       {/* Sidebar */}
-      <SideBar fullWidth/>
+      <SideBar fullWidth={true}/>
 
       <Box className="welcome-msg">
         <img src="/logo.svg" alt="" />

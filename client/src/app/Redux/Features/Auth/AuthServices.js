@@ -1,6 +1,8 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from 'axios';
 import utils from "../../../Api/utils";
+import Cookie from "../../../Helpers/Cookie";
+
 const RegisterUser = createAsyncThunk('auth/register', async (data, { rejectWithValue }) => {
     try {
 
@@ -13,4 +15,18 @@ const RegisterUser = createAsyncThunk('auth/register', async (data, { rejectWith
 })
 
 
-export { RegisterUser }
+const LoginUser = createAsyncThunk('auth/login', async (data, { rejectWithValue }) => {
+    try {
+
+        const response = await axios.post(utils.server.paths.getRequestPath('login'), data);
+        Cookie.set('authorization', response.data.data.token, 2); // Set Auth Cookie
+        return response.data
+    } catch (err) {
+        return rejectWithValue(err)
+    }
+
+})
+
+
+
+export { RegisterUser, LoginUser }

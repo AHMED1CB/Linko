@@ -33,3 +33,19 @@ export const registerSchema = z
         message: "Passwords do not match",
         path: ["passwordConfirmation"],
     });
+
+
+export const loginSchema = z
+    .object({
+        username: z
+            .string()
+            .min(3, "Username must be at least 3 characters")
+            .max(64, "Username must be less than or equal to 64 characters")
+            .trim(),
+
+        password: z
+            .string()
+            .min(8, "Password must be at least 8 characters")
+            .trim(),
+
+    });

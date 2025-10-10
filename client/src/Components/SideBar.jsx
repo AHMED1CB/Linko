@@ -55,7 +55,7 @@ export default ({ fullWidth = false }) => {
   return (
     <Slide
       direction="right"
-      className={`sidebar ${fullWidth ? "chat-side-full" : ""}`}
+      className={fullWidth ? "chat-side-full" : "sidebar"}
       in={true}
       timeout={800}
     >

@@ -39,6 +39,11 @@ function Register() {
       return;
     }
 
+    if (!import.meta.env.VITE_API_URL) {
+      setAlert({ show: true, text: "Something Went Wrong Try Again Later" });
+      return;
+    }
+
     setAlert({ show: false, text: "" });
 
     try {
