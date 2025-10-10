@@ -24,6 +24,10 @@ function Login() {
   const dispatch = useDispatch();
   const go = useNavigate();
   const tryToLogin = async () => {
+    if (!import.meta.env.VITE_API_URL) {
+      setAlert({ show: true, text: "Something Went Wrong Try Again Later" });
+      return;
+    }
     let parse = loginSchema.safeParse(data);
 
     if (!parse.success) {
