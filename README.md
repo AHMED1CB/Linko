@@ -17,8 +17,6 @@ It enables users to send and receive messages instantly, supports user authentic
 5. [Environment Variables](#environment-variables)
 6. [Usage](#usage)
 7. [Project Structure](#project-structure)
-8. [Contributing](#contributing)
-9. [License](#license)
 
 ---
 
