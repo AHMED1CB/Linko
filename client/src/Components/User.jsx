@@ -14,26 +14,54 @@ import {
 import { Edit, Settings, Close, CameraAlt, Send } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
 import { useState, useEffect } from "react";
-import { useAuth } from "../app/Contexts/AuthContext";
-import { useLocation } from "react-router-dom";
 
-const ProfilePage = ({ isProfile }) => {
+import { useAuth } from "../app/Contexts/AuthContext";
+import { useLocation, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { getByUsername } from "../app/Redux/Features/User/UserServices";
+import { useLoader } from "../app/Contexts/LoaderContext";
+import NotFound from "./NotFound";
+
+const ProfilePage = ({ isProfile = false }) => {
   const theme = useTheme();
   const [animate, setAnimate] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
+
   const [user, setUser] = useState(null);
+
   const { pathname: location } = useLocation();
   let currentUser = useAuth();
+  const { username } = useParams();
+  const userByUserName = useSelector((state) => state.users.user);
+  const status = useSelector((state) => state.users.status);
+
+  const dispatch = useDispatch();
+  const { showLoader, hideLoader } = useLoader();
 
   useEffect(() => {
-    setAnimate(true);
     if (isProfile) {
       setUser(currentUser);
+      return;
     }
+
+    if (username) {
+      // get userDetails
+      const getUser = async () => {
+        await dispatch(getByUsername(username)).unwrap();
+      };
+      showLoader();
+      getUser().finally(hideLoader);
+    }
+    setAnimate(true);
   }, [location]);
 
+  useEffect(() => {
+    if (userByUserName && userByUserName._id !== currentUser._id)
+      setUser(userByUserName);
+  }, [userByUserName]);
+
   return (
-    user && (
+    (user && status !== 400 && (
       <Box sx={{ width: "100%", maxWidth: 600, margin: "auto", mt: 5, px: 2 }}>
         <Box
           sx={{
@@ -240,7 +268,7 @@ const ProfilePage = ({ isProfile }) => {
           </Slide>
         </Modal>
       </Box>
-    )
+    )) || <NotFound />
   );
 };
 

@@ -5,9 +5,10 @@ const utils = {
             register: "/auth/register",
             login: "/auth/login",
             profile: "/auth/profile",
+            user: "/users",
 
-            getRequestPath: (name) => {
-                return utils.url + utils.server.paths[name];
+            getRequestPath: (name, ...more) => {
+                return utils.url + utils.server.paths[name] + '/' + more.join('/') ;
             }
         }
     }
