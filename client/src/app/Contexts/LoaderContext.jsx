@@ -1,5 +1,6 @@
 import { createContext, useContext, useState } from "react";
 import CircularProgress from "@mui/material/CircularProgress";
+import Loader from "../../Components/Loader";
 
 const LoaderContext = createContext();
 
@@ -13,20 +14,7 @@ export const LoaderProvider = ({ children }) => {
         <LoaderContext.Provider value={{ showLoader, hideLoader }}>
             {children}
             {loading && (
-                <div style={{
-                    position: "fixed",
-                    top: 0,
-                    left: 0,
-                    width: "100vw",
-                    height: "100vh",
-                    backgroundColor: "rgba(0,0,0,0.5)",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    zIndex: 9999,
-                }}>
-                    <CircularProgress color="primary" />
-                </div>
+                <Loader/>
             )}
         </LoaderContext.Provider>
     );

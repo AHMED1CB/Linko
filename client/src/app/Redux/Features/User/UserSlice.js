@@ -2,21 +2,25 @@ import { createSlice } from "@reduxjs/toolkit";
 import { getByUsername } from "./UserServices";
 
 const UserSlice = createSlice({
-    name: "auth",
+    name: "users",
     initialState: {
         user: null,
-        status: 0
+        status: "Loading"
     },
     reducers: {
 
     },
     extraReducers: (b) => {
+        b.addCase(getByUsername.pending, (state, action) => {
+            state.status = "Loading"
+        })
+        b.addCase(getByUsername.fulfilled, (state, action) => {
+            state.user = action?.payload?.data?.user || null
+            state.status = "Success"
+        })
         b.addCase(getByUsername.rejected, (state) => {
-            state.status = 400
-            state. user= null
-        }).addCase(getByUsername.fulfilled, (state, action) => {
-            state.user = action.payload.data.user
-            state.status = 200
+            state.status = "Fail"
+            state.user = null
         })
     }
 

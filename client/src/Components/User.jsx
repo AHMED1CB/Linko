@@ -13,31 +13,29 @@ import {
 } from "@mui/material";
 import { Edit, Settings, Close, CameraAlt, Send } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 
 import { useAuth } from "../app/Contexts/AuthContext";
 import { useLocation, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getByUsername } from "../app/Redux/Features/User/UserServices";
-import { useLoader } from "../app/Contexts/LoaderContext";
 import NotFound from "./NotFound";
+import Loader from "./Loader";
 
 const ProfilePage = ({ isProfile = false }) => {
   const theme = useTheme();
   const [animate, setAnimate] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
 
-  const [user, setUser] = useState(null);
-
+  const [user, setUser] = useState(null); // THE USER TO SHOW ON PAGE
   const { pathname: location } = useLocation();
-  let currentUser = useAuth();
-  const { username } = useParams();
-  const userByUserName = useSelector((state) => state.users.user);
+  let currentUser = useAuth(); // Authorized User
+
+  const { username } = useParams(); // username FROM url
+  const targetUser = useSelector((state) => state.users.user); // The Target User
   const status = useSelector((state) => state.users.status);
 
   const dispatch = useDispatch();
-  const { showLoader, hideLoader } = useLoader();
-
   useEffect(() => {
     if (isProfile) {
       setUser(currentUser);
@@ -45,23 +43,31 @@ const ProfilePage = ({ isProfile = false }) => {
     }
 
     if (username) {
-      // get userDetails
-      const getUser = async () => {
-        await dispatch(getByUsername(username)).unwrap();
-      };
-      showLoader();
-      getUser().finally(hideLoader);
+      dispatch(getByUsername(username)).unwrap();
     }
-    setAnimate(true);
   }, [location]);
 
   useEffect(() => {
-    if (userByUserName && userByUserName._id !== currentUser._id)
-      setUser(userByUserName);
-  }, [userByUserName]);
+    if (!isProfile) {
+      if (targetUser && targetUser._id !== currentUser._id) setUser(targetUser);
+    }
+  }, [targetUser]);
+
+  useEffect(() => {
+    if (user) {
+      setAnimate(true);
+    }
+  }, [user]);
+
+  if (!isProfile && status == "Loading") {
+    return <Loader />;
+  }
+  if (status === "Fail" && !isProfile) {
+    return <NotFound />;
+  }
 
   return (
-    (user && status !== 400 && (
+    user && (
       <Box sx={{ width: "100%", maxWidth: 600, margin: "auto", mt: 5, px: 2 }}>
         <Box
           sx={{
@@ -268,7 +274,7 @@ const ProfilePage = ({ isProfile = false }) => {
           </Slide>
         </Modal>
       </Box>
-    )) || <NotFound />
+    )
   );
 };
 
