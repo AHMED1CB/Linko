@@ -1,3 +1,5 @@
+import Friend from "../Models/Friend.js";
+import Request from "../Models/Request.js";
 import User from "../Models/User.js";
 
 export default class UserController {
@@ -13,6 +15,21 @@ export default class UserController {
         error: "Cannot Find User With this username",
       });
     }
+
+    targetUser = targetUser.toObject();
+
+    const [isRequested, isFriend] = await Promise.all([
+      Request.exists({ from: req.user.id, to: targetUser._id }),
+      Friend.exists({
+        user: req.user.id,
+        "friends._id": targetUser._id
+      })
+    ]);
+
+
+    targetUser.isRequested = Boolean(isRequested)
+    targetUser.isFriend = Boolean(isFriend)
+
 
     return res.status(200).json({
       status: "Success",

@@ -28,6 +28,8 @@ app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 app.use(helmet());
+app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
+
 
 // Routes
 
@@ -35,6 +37,8 @@ app.use("/auth", Auth);
 app.use("/users", Users);
 app.use("/requests", authToken, Requests);
 app.use("/friends", authToken, Friends);
+
+app.use("/storage", express.static('./Storage'))
 
 // Error Handler 
 app.use(errorHandler);

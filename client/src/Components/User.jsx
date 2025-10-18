@@ -42,7 +42,7 @@ const ProfilePage = ({ isProfile = false }) => {
 
   const targetUser = useSelector((state) => state.users.user); // The Target User
 
-  const status = useSelector((state) => state.auth.status);
+  const status = useSelector((state) => state.users.status);
 
   const dispatch = useDispatch();
   useEffect(() => {
@@ -64,7 +64,6 @@ const ProfilePage = ({ isProfile = false }) => {
       setUser(targetUser);
       return;
     }
-
     go("/profile");
   }, [targetUser]);
 
@@ -77,12 +76,6 @@ const ProfilePage = ({ isProfile = false }) => {
   // profile data
 
   const [photo, setPhoto] = useState(null);
-  if (!isProfile && status == "Loading") {
-    return <Loader />;
-  }
-  if (status === "Fail" && !isProfile) {
-    return <NotFound />;
-  }
 
   const updateProfileData = async () => {
     // update data
@@ -109,8 +102,17 @@ const ProfilePage = ({ isProfile = false }) => {
     if (!targetUser) return;
     if (!targetUser.isRequested) {
       await dispatch(sendRequest(targetUser._id)).unwrap();
+      setUser({ ...user, isRequested: true });
     }
   };
+
+  if (status === "Fail" && !isProfile) {
+    return <NotFound />;
+  }
+
+  if (!isProfile && status == "Loading") {
+    return <Loader />;
+  }
 
   return (
     user && (
@@ -204,9 +206,9 @@ const ProfilePage = ({ isProfile = false }) => {
             <Button
               variant="contained"
               startIcon={
-                isProfile ? <Edit /> : !targetUser.isRequested ? <Send /> : ""
+                isProfile ? <Edit /> : !user.isRequested ? <Send /> : ""
               }
-              disabled={!isProfile && targetUser.isRequested}
+              disabled={!isProfile && user.isRequested}
               sx={{
                 mt: 2,
                 borderRadius: 8,
@@ -220,17 +222,19 @@ const ProfilePage = ({ isProfile = false }) => {
               }}
               onClick={() =>
                 isProfile
-                  ? setEditOpen(true)
-                  : !targetUser.isRequested
+                  ? setEditOpen(!editOpen)
+                  : !user.isRequested && !user.isFriend
                   ? sendFriendRequest()
                   : () => {}
               }
             >
               {isProfile
                 ? "Edit Profile"
-                : targetUser.isRequested
+                : user.isRequested
                 ? "Friend Request Sent"
-                : "Chat With User"}
+                : user.isFriend
+                ? "Chat With User"
+                : "Send Friend Request"}
             </Button>
           </Box>
         </Grow>

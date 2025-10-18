@@ -6,6 +6,8 @@ import {
 import User from "../Models/User.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import Friend from "../Models/Friend.js";
+import Request from "../Models/Request.js";
 
 
 export default class AuthController {
@@ -112,12 +114,40 @@ export default class AuthController {
   }
 
   static async GetProfile(req, res) {
+
+    let userProfile = await User.findById(req.user.id).select('-password');
+    userProfile = userProfile.toObject();
+
+
+    // Send Requests And Friends List
+
+    const userHasFriends = await Friend.exists({ user: userProfile._id });
+
+    const [friendsDoc, requests] = await Promise.all([
+      userHasFriends ?
+        Friend.find({ user: userProfile._id }).select('friends -_id').populate({
+          path: 'friends',
+          model: User,
+          select: '-password'
+        }) : [],
+
+      await Request.find({ to: userProfile._id }).populate({
+        path: 'from',
+        model: User,
+        select: '-password'
+      })
+    ]);
+
+    userProfile.friends = friendsDoc.friends
+    userProfile.requests = requests
+
+
     return res.status(200).json({
       message: "",
       error: "",
       status: "Success",
       data: {
-        user: await User.findById(req.user.id).select('-password'),
+        user: userProfile,
       },
     });
   }
@@ -135,6 +165,7 @@ export default class AuthController {
       });
     }
 
+
     const toUpdate = ["username", "name", "bio"];
     const data = {};
 
@@ -146,6 +177,19 @@ export default class AuthController {
 
     if (req["file"]) {
       data["photo"] = req.file.filename;
+    }
+    if (req.body.username) {
+      let userByUserName = await User.findOne({username:req.body.username});
+      
+      if (userByUserName  && userByUserName._id != req.user.id) {
+        return res.status(409).json({
+          status: "Fail",
+          message: "Invalid Profile Data",
+          error: "Username Already Used",
+          data: null
+        });
+
+      }
     }
 
     const updatedUser = await User.findByIdAndUpdate(userId, data, {

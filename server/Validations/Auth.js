@@ -19,5 +19,5 @@ export const updateSchema = Joi.object({
     mimetype: Joi.string().valid("image/jpeg", "image/png", "image/gif"),
     size: Joi.number().max(5 * 1024 * 1024),
   }),
-  bio: Joi.string().min(8),
+  bio: Joi.string(),
 });
