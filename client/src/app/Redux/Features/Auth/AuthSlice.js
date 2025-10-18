@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { GetUserProfile } from "./AuthServices";
+import { GetUserProfile, UpdateUserProfile } from "./AuthServices";
 import Cookie from "../../../Helpers/Cookie";
 
 const AuthSlice = createSlice({
@@ -8,7 +8,7 @@ const AuthSlice = createSlice({
         user: null,
     },
     reducers: {
-
+    
     },
     extraReducers: (b) => {
         b.addCase(GetUserProfile.fulfilled, (state, action) => {
@@ -18,11 +18,16 @@ const AuthSlice = createSlice({
                 if (action.payload.request.status === 401) {
                     Cookie.delete('authorization');
                     location.href = '/auth/login'
-                }else{
+                } else {
                     alert('Something Went Wrong Please Try Again Later')
                     location.reload()
                 }
             })
+
+        b.addCase(UpdateUserProfile.fulfilled, (state, action) => {
+            state.user = action.payload.data.user;
+            state.error = null
+        })
 
     }
 

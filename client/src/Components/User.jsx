@@ -11,46 +11,61 @@ import {
   Slide,
   Stack,
 } from "@mui/material";
-import { Edit, Settings, Close, CameraAlt, Send } from "@mui/icons-material";
+import { Edit, Close, CameraAlt, Send } from "@mui/icons-material";
 import { useTheme } from "@mui/material/styles";
-import { useState, useEffect, use } from "react";
+import { useState, useEffect } from "react";
 
 import { useAuth } from "../app/Contexts/AuthContext";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getByUsername } from "../app/Redux/Features/User/UserServices";
 import NotFound from "./NotFound";
 import Loader from "./Loader";
+import { UpdateUserProfile } from "../app/Redux/Features/Auth/AuthServices";
+import utils from "../app/Api/utils";
+import { sendRequest } from "../app/Redux/Features/Requests/RequestsServices";
+import Alert from "../app/Swal/Alert";
 
 const ProfilePage = ({ isProfile = false }) => {
   const theme = useTheme();
   const [animate, setAnimate] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
+  const go = useNavigate();
 
   const [user, setUser] = useState(null); // THE USER TO SHOW ON PAGE
+
   const { pathname: location } = useLocation();
+
   let currentUser = useAuth(); // Authorized User
 
   const { username } = useParams(); // username FROM url
+
   const targetUser = useSelector((state) => state.users.user); // The Target User
-  const status = useSelector((state) => state.users.status);
+
+  const status = useSelector((state) => state.auth.status);
 
   const dispatch = useDispatch();
   useEffect(() => {
+    Alert.configure(theme);
+  }, [theme]);
+
+  useEffect(() => {
     if (isProfile) {
       setUser(currentUser);
+    } else if (username) {
+      dispatch(getByUsername(username)).unwrap();
+    }
+  }, [location, currentUser, username]);
+
+  useEffect(() => {
+    if (!targetUser) return;
+
+    if (targetUser._id !== currentUser._id) {
+      setUser(targetUser);
       return;
     }
 
-    if (username) {
-      dispatch(getByUsername(username)).unwrap();
-    }
-  }, [location]);
-
-  useEffect(() => {
-    if (!isProfile) {
-      if (targetUser && targetUser._id !== currentUser._id) setUser(targetUser);
-    }
+    go("/profile");
   }, [targetUser]);
 
   useEffect(() => {
@@ -59,12 +74,43 @@ const ProfilePage = ({ isProfile = false }) => {
     }
   }, [user]);
 
+  // profile data
+
+  const [photo, setPhoto] = useState(null);
   if (!isProfile && status == "Loading") {
     return <Loader />;
   }
   if (status === "Fail" && !isProfile) {
     return <NotFound />;
   }
+
+  const updateProfileData = async () => {
+    // update data
+    const profileData = new FormData();
+    profileData.append("username", user.username);
+    profileData.append("name", user.name);
+    profileData.append("bio", user.bio ?? "No Bio");
+
+    if (photo) {
+      profileData.append("photo", photo);
+    }
+
+    try {
+      await dispatch(UpdateUserProfile(profileData)).unwrap();
+    } catch (err) {
+      let error = err?.response?.data?.error || "Something Went Wrong";
+      Alert.error("Invalid User Data", error);
+    } finally {
+      setEditOpen(false);
+    }
+  };
+
+  const sendFriendRequest = async () => {
+    if (!targetUser) return;
+    if (!targetUser.isRequested) {
+      await dispatch(sendRequest(targetUser._id)).unwrap();
+    }
+  };
 
   return (
     user && (
@@ -80,9 +126,6 @@ const ProfilePage = ({ isProfile = false }) => {
           <Typography variant="h5" sx={{ color: theme.palette.text.primary }}>
             {isProfile ? "Profile" : `${user.username}'s Profile`}
           </Typography>
-          <IconButton sx={{ color: theme.palette.text.secondary }}>
-            <Settings />
-          </IconButton>
         </Box>
 
         <Grow in={animate} timeout={500}>
@@ -96,39 +139,61 @@ const ProfilePage = ({ isProfile = false }) => {
             }}
           >
             <Box sx={{ position: "relative", display: "inline-block" }}>
-              <Avatar
-                sx={{
-                  width: 120,
-                  height: 120,
-                  bgcolor: theme.palette.primary.main,
-                  animation: "pulse 2s infinite",
-                  transition: "transform 0.3s",
-                  "&:hover": { transform: "scale(1.15)" },
-                }}
-              >
-                {user.name[0].toUpperCase()}
-              </Avatar>
-              <IconButton
-                sx={{
-                  position: "absolute",
-                  bottom: 0,
-                  right: 0,
-                  bgcolor: theme.palette.background.paper,
-                  "&:hover": {
+              {(user.photo && (
+                <img
+                  className="profile_photo"
+                  src={utils.url + "/storage/photos/" + user.photo}
+                />
+              )) || (
+                <Avatar
+                  sx={{
+                    width: 120,
+                    height: 120,
                     bgcolor: theme.palette.primary.main,
-                    color: "#fff",
-                    transform: "scale(1.2)",
-                  },
+                    animation: "pulse 2s infinite",
+                    transition: "transform 0.3s",
+                    "&:hover": { transform: "scale(1.15)" },
+                  }}
+                >
+                  {user.username[0].toUpperCase()}
+                </Avatar>
+              )}
+
+              <input
+                type="file"
+                id="profile-image"
+                accept="image/*"
+                style={{ display: "none" }}
+                onChange={() => {
+                  setPhoto(event.target.files[0]);
+                  setEditOpen(true);
                 }}
-              >
-                <CameraAlt />
-              </IconButton>
+              />
+
+              <label htmlFor="profile-image" hidden={!isProfile}>
+                <IconButton
+                  component="span"
+                  sx={{
+                    position: "absolute",
+                    bottom: 0,
+                    right: 0,
+                    bgcolor: "background.paper",
+                    "&:hover": {
+                      bgcolor: "primary.main",
+                      color: "#fff",
+                      transform: "scale(1.2)",
+                    },
+                  }}
+                >
+                  <CameraAlt />
+                </IconButton>
+              </label>
             </Box>
             <Typography
               variant="h6"
               sx={{ color: theme.palette.text.primary, mt: 2 }}
             >
-              {user.name}
+              {user.username}
             </Typography>
             <Typography
               variant="body2"
@@ -138,7 +203,10 @@ const ProfilePage = ({ isProfile = false }) => {
             </Typography>
             <Button
               variant="contained"
-              startIcon={isProfile ? <Edit /> : <Send />}
+              startIcon={
+                isProfile ? <Edit /> : !targetUser.isRequested ? <Send /> : ""
+              }
+              disabled={!isProfile && targetUser.isRequested}
               sx={{
                 mt: 2,
                 borderRadius: 8,
@@ -150,9 +218,19 @@ const ProfilePage = ({ isProfile = false }) => {
                 },
                 "&:active": { transform: "translateY(1px)" },
               }}
-              // onClick={() => setEditOpen(true)}
+              onClick={() =>
+                isProfile
+                  ? setEditOpen(true)
+                  : !targetUser.isRequested
+                  ? sendFriendRequest()
+                  : () => {}
+              }
             >
-              {isProfile ? "Edit Profile" : "Send Request"}
+              {isProfile
+                ? "Edit Profile"
+                : targetUser.isRequested
+                ? "Friend Request Sent"
+                : "Chat With User"}
             </Button>
           </Box>
         </Grow>
@@ -235,25 +313,30 @@ const ProfilePage = ({ isProfile = false }) => {
               <TextField
                 fullWidth
                 label="Username"
-                defaultValue="@johndoe"
+                defaultValue={user.username}
                 variant="outlined"
                 sx={{ mb: 2 }}
+                onChange={() =>
+                  setUser({ ...user, username: event.target.value })
+                }
               />
               <TextField
                 fullWidth
-                label="Phone"
-                defaultValue="+1 234 567 890"
+                label="Name"
+                defaultValue={user.name}
                 variant="outlined"
                 sx={{ mb: 2 }}
+                onChange={() => setUser({ ...user, name: event.target.value })}
               />
               <TextField
                 fullWidth
                 label="Bio"
-                defaultValue="Passionate about coding and messaging apps."
+                defaultValue={currentUser.bio ?? "No Bio"}
                 variant="outlined"
                 multiline
                 rows={3}
                 sx={{ mb: 2 }}
+                onChange={() => setUser({ ...user, bio: event.target.value })}
               />
               <Button
                 variant="contained"
@@ -267,6 +350,7 @@ const ProfilePage = ({ isProfile = false }) => {
                   },
                   "&:active": { transform: "translateY(1px)" },
                 }}
+                onClick={updateProfileData}
               >
                 Save
               </Button>

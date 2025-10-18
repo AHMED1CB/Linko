@@ -4,16 +4,15 @@ import utils from "../../../Api/utils";
 import Cookie from "../../../Helpers/Cookie";
 
 
-
-export const getByUsername = createAsyncThunk('user/getByName', async (username, { rejectWithValue }) => {
-
+export const sendRequest = createAsyncThunk('user/sendFriendRequest', async (targetUser, { rejectWithValue }) => {
 
     try {
-        const response = await axios.get(utils.server.paths.getRequestPath('user', username), {
+
+        const response = await axios.post(utils.server.paths.getRequestPath('requests', targetUser, 'send'), {}, {
             headers: {
                 Authorization: Cookie.get('authorization')
             }
-        });
+        })
 
         return response.data
     } catch (error) {
@@ -21,4 +20,5 @@ export const getByUsername = createAsyncThunk('user/getByName', async (username,
     }
 
 })
+
 

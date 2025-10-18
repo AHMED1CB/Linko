@@ -48,4 +48,24 @@ const GetUserProfile = createAsyncThunk('auth/profile', async (_, { rejectWithVa
 
 
 
-export { RegisterUser, LoginUser, GetUserProfile }
+const UpdateUserProfile = createAsyncThunk('auth/profile/update', async (data, { rejectWithValue }) => {
+    try {
+
+        const authToken = Cookie.get('authorization');
+
+        const response = await axios.put(utils.server.paths.getRequestPath('updateProfile'), data, {
+            headers: {
+                Authorization: authToken
+            }
+        });
+        return response.data
+    } catch (err) {
+        return rejectWithValue(err)
+    }
+
+})
+
+
+
+
+export { RegisterUser, LoginUser, GetUserProfile, UpdateUserProfile }

@@ -6,9 +6,11 @@ const utils = {
             login: "/auth/login",
             profile: "/auth/profile",
             user: "/users",
+            updateProfile: "/auth/profile/update",
+            requests: "/requests", // dynamic id here + '/request'
 
             getRequestPath: (name, ...more) => {
-                return utils.url + utils.server.paths[name] + '/' + more.join('/') ;
+                return utils.url + utils.server.paths[name] + '/' + more.join('/');
             }
         }
     }
