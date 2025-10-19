@@ -7,6 +7,9 @@ import helmet from "helmet";
 import cors from "cors";
 import bodyParser from "body-parser";
 import connect from "./Mongose/Connection.js";
+import path from "path";
+
+
 
 import Auth from "./Routes/Auth.js";
 import Users from "./Routes/Users.js";
@@ -42,6 +45,10 @@ app.use("/storage", express.static('./Storage'))
 
 // Error Handler 
 app.use(errorHandler);
+
+
+
+
 
 // SOCKET IO
 let server = http.createServer(app);
