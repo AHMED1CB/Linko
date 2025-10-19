@@ -220,12 +220,14 @@ const ProfilePage = ({ isProfile = false }) => {
                 },
                 "&:active": { transform: "translateY(1px)" },
               }}
-              onClick={() =>
+              onClick={
                 isProfile
-                  ? setEditOpen(!editOpen)
+                  ? () => setEditOpen(!editOpen)
                   : !user.isRequested && !user.isFriend
-                  ? sendFriendRequest()
-                  : () => {}
+                  ? sendFriendRequest
+                  : user.isFriend
+                  ? () => go(`/user/${user.username}/chat`)
+                  : undefined
               }
             >
               {isProfile

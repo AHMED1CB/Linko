@@ -7,6 +7,8 @@ import SideBar from "./SideBar";
 const HomePage = () => {
   const theme = useTheme();
 
+
+
   return (
     <Box
       sx={{

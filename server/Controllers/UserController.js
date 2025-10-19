@@ -22,7 +22,7 @@ export default class UserController {
       Request.exists({ from: req.user.id, to: targetUser._id }),
       Friend.exists({
         user: req.user.id,
-        "friends._id": targetUser._id
+        "friends": targetUser._id
       })
     ]);
 

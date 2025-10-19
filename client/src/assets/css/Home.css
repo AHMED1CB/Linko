@@ -222,13 +222,12 @@
   .chat-side-full {
     width: 100% !important;
   }
-  .welcome-msg{
+  .welcome-msg {
     display: none;
   }
 }
 
-
-.profile_photo{
+.profile_photo {
   width: 100px;
   height: 100px;
   border-radius: 50%;

@@ -100,5 +100,9 @@ a:not(header a) {
   .sidebar{
     display: none !important
   }
+}
 
+
+.defaultSide{
+  width: 30% !important;
 }

@@ -22,3 +22,38 @@ export const sendRequest = createAsyncThunk('user/sendFriendRequest', async (tar
 })
 
 
+
+export const acceptRequest = createAsyncThunk('user/acceptFriendRequest', async (targetUser, { rejectWithValue }) => {
+    try {
+
+        const response = await axios.post(utils.server.paths.getRequestPath('requests', targetUser, 'accept'), {}, {
+            headers: {
+                Authorization: Cookie.get('authorization')
+            }
+        })
+
+        return response.data
+    } catch (error) {
+        return rejectWithValue(error)
+    }
+
+})
+
+
+export const rejectRequest = createAsyncThunk('user/RejectFriendRequest', async (targetUser, { rejectWithValue }) => {
+    try {
+
+        const response = await axios.post(utils.server.paths.getRequestPath('requests', targetUser, 'reject'), {}, {
+            headers: {
+                Authorization: Cookie.get('authorization')
+            }
+        })
+
+        return response.data
+    } catch (error) {
+        return rejectWithValue(error)
+    }
+
+})
+
+

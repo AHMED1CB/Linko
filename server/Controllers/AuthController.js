@@ -121,24 +121,27 @@ export default class AuthController {
 
     // Send Requests And Friends List
 
-    const userHasFriends = await Friend.exists({ user: userProfile._id });
+    const userHasFriends = await Friend.exists({ user: req.user.id });
 
     const [friendsDoc, requests] = await Promise.all([
-      userHasFriends ?
-        Friend.find({ user: userProfile._id }).select('friends -_id').populate({
+      userHasFriends ? Friend.findOne({ user: userProfile._id })
+        .select('friends -_id')
+        .populate({
           path: 'friends',
           model: User,
           select: '-password'
-        }) : [],
-
-      await Request.find({ to: userProfile._id }).populate({
+        })
+        : null,
+      Request.find({ to: userProfile._id }).populate({
         path: 'from',
         model: User,
         select: '-password'
       })
     ]);
 
-    userProfile.friends = friendsDoc.friends
+
+
+    userProfile.friends = friendsDoc?.friends || []
     userProfile.requests = requests
 
 
@@ -179,9 +182,9 @@ export default class AuthController {
       data["photo"] = req.file.filename;
     }
     if (req.body.username) {
-      let userByUserName = await User.findOne({username:req.body.username});
-      
-      if (userByUserName  && userByUserName._id != req.user.id) {
+      let userByUserName = await User.findOne({ username: req.body.username });
+
+      if (userByUserName && userByUserName._id != req.user.id) {
         return res.status(409).json({
           status: "Fail",
           message: "Invalid Profile Data",
