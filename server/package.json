@@ -4,7 +4,8 @@
   "description": "The Api And Socket of Linko Chat app",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon"
+    "dev": "nodemon",
+    "start": "node app.js"
   },
   "author": "Ahmed1cb",
   "license": "MIT",
