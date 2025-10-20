@@ -14,6 +14,7 @@ import { useState } from "react";
 import { useLoader } from "../app/Contexts/LoaderContext";
 import { useDispatch } from "react-redux";
 import { RegisterUser } from "../app/Redux/Features/Auth/AuthServices.js";
+import Converter from "../app/Helpers/TextConverter.js";
 
 function Register() {
   let initialData = {
@@ -50,7 +51,7 @@ function Register() {
       showLoader();
       await dispatch(
         RegisterUser({
-          username: data.username,
+          username: Converter.Username(data.username),
           name: data.name,
           email: data.email,
           password: data.password,
@@ -102,7 +103,7 @@ function Register() {
             variant="outlined"
             fullWidth
             margin="normal"
-            onChange={() => setData({ ...data, username: event.target.value })}
+            onChange={() => setData({ ...data, username: Converter.Username(event.target.value) })}
             value={data.username}
           />
           <TextField

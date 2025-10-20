@@ -13,6 +13,7 @@ import { useState } from "react";
 import { loginSchema } from "../app/Validations/Auth";
 import { useDispatch } from "react-redux";
 import { LoginUser } from "../app/Redux/Features/Auth/AuthServices";
+import Converter from "../app/Helpers/TextConverter";
 
 function Login() {
   let initialData = {
@@ -82,7 +83,12 @@ function Login() {
             fullWidth
             margin="normal"
             value={data.username}
-            onChange={() => setData({ ...data, username: event.target.value })}
+            onChange={() =>
+              setData({
+                ...data,
+                username: Converter.Username(event.target.value),
+              })
+            }
           />
           <PasswordField
             label="Password"

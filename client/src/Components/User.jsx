@@ -114,6 +114,7 @@ const ProfilePage = ({ isProfile = false }) => {
     return <Loader />;
   }
 
+
   return (
     user && (
       <Box sx={{ width: "100%", maxWidth: 600, margin: "auto", mt: 5, px: 2 }}>

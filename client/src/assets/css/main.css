@@ -15,7 +15,7 @@ a {
 }
 
 header {
-  padding: 8px;
+  max-height: 82px;
 }
 
 .logo-container {
@@ -105,4 +105,12 @@ a:not(header a) {
 
 .defaultSide{
   width: 30% !important;
+}
+
+.sad-msg{
+  font-size: 32px;
+  width: 100%;
+  text-align: center;
+  margin-top: 90px;
+  color: darkgray;
 }

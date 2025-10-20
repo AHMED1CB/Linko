@@ -22,13 +22,22 @@ import {
 } from "@mui/icons-material";
 import { useContext } from "react";
 import { ThemeContext } from "../app/Contexts/ThemeContext";
+import Cookie from "../app/Helpers/Cookie";
+import { useNavigate } from "react-router-dom";
 
 export default function SettingsPage() {
   const { setTheme, theme } = useContext(ThemeContext);
+  const go = useNavigate()
 
   const changeTheme = () => {
     setTheme(theme == "dark" ? "light" : "dark");
   };
+
+  const logOutUser = () => {
+    Cookie.delete('authorization');
+    go('/auth/login')
+    
+  }
 
   return (
     <Box
@@ -137,7 +146,7 @@ export default function SettingsPage() {
                 <ListItemText primary="Language" secondary="English" />
               </ListItem>
               <Divider />
-              <ListItem sx={{ "&:hover": { bgcolor: "action.hover" } }}>
+              <ListItem onClick={logOutUser} sx={{ "&:hover": { bgcolor: "action.hover" } , cursor: "pointer" , borderRadius:'18px' }}>
                 <ListItemIcon>
                   <ExitToApp color="error" />
                 </ListItemIcon>

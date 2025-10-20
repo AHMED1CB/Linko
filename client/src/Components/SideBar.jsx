@@ -14,7 +14,7 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import { keyframes, useTheme } from "@mui/material/styles";
 
-import { Search, MoreVert, Close, Check } from "@mui/icons-material";
+import { Search, MoreVert, Close, Check, AllOut, PortableWifiOff, Person2, Person, Person3Outlined } from "@mui/icons-material";
 import { useAuth } from "../app/Contexts/AuthContext";
 import utils from "../app/Api/utils";
 import { useDispatch } from "react-redux";
@@ -46,7 +46,7 @@ export default ({ fullWidth = false }) => {
 
   const friends = user.friends;
 
-  const [requests, setRequests] = useState(user.requests);
+  const [requests, setRequests] = useState(user.requests ?? []);
   const isActiveFriend = (u) => {
     return u === username;
   };
@@ -179,16 +179,7 @@ export default ({ fullWidth = false }) => {
                   }}
                 >
                   <Zoom in timeout={1000}>
-                    <Badge
-                      color="success"
-                      variant="dot"
-                      overlap="circular"
-                      sx={{
-                        "& .MuiBadge-dot": {
-                          animation: `${pulse} 2s infinite`,
-                        },
-                      }}
-                    >
+                  
                       <Avatar
                         sx={{
                           bgcolor: theme.palette.primary.main,
@@ -198,7 +189,6 @@ export default ({ fullWidth = false }) => {
                       >
                         {senderPhoto}
                       </Avatar>
-                    </Badge>
                   </Zoom>
 
                   <Box sx={{ ml: 2, flex: 1 }}>
@@ -284,7 +274,7 @@ export default ({ fullWidth = false }) => {
                   }}
                 >
                   <Zoom in={true} timeout={1000}>
-                    <Badge
+                    {/* <Badge
                       color="success"
                       variant="dot"
                       overlap="circular"
@@ -293,17 +283,17 @@ export default ({ fullWidth = false }) => {
                           animation: `${pulse} 2s infinite`,
                         },
                       }}
+                    > */}
+                    <Avatar
+                      sx={{
+                        bgcolor: theme.palette.primary.main,
+                        transition: "all 0.3s",
+                        "&:hover": { transform: "scale(1.1)" },
+                      }}
                     >
-                      <Avatar
-                        sx={{
-                          bgcolor: theme.palette.primary.main,
-                          transition: "all 0.3s",
-                          "&:hover": { transform: "scale(1.1)" },
-                        }}
-                      >
-                        {friendProfilePhoto}
-                      </Avatar>
-                    </Badge>
+                      {friendProfilePhoto}
+                    </Avatar>
+                    {/* </Badge> */}
                   </Zoom>
                   <Box sx={{ ml: 2, flex: 1 }}>
                     <Typography
@@ -338,6 +328,9 @@ export default ({ fullWidth = false }) => {
               </Grow>
             );
           })}
+
+          {user.friends.length == 0 && <h2 className="sad-msg">You Are Alone!</h2>}
+
         </Box>
       </Box>
     </Slide>

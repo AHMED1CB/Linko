@@ -17,7 +17,7 @@ export default class AuthController {
 
     const data = {
       username: req.body.username,
-      name: req.body.username,
+      name: req.body.name, // FIXED
       email: req.body.email,
       password: await bcrypt.hash(req.body.password, 8),
       bio: null,

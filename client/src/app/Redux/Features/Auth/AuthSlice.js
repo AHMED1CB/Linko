@@ -1,7 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { GetUserProfile, UpdateUserProfile } from "./AuthServices";
 import Cookie from "../../../Helpers/Cookie";
-import { getByUsername } from "../User/UserServices";
 
 const AuthSlice = createSlice({
     name: "auth",
@@ -27,7 +26,7 @@ const AuthSlice = createSlice({
             })
 
         b.addCase(UpdateUserProfile.fulfilled, (state, action) => {
-            state.user = action.payload.data.user;
+            state.user = { ...state.user, ...action.payload.data.user };
             state.error = null
         })
 
