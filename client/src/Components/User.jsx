@@ -73,6 +73,7 @@ const ProfilePage = ({ isProfile = false }) => {
     }
   }, [user]);
 
+
   // profile data
 
   const [photo, setPhoto] = useState(null);

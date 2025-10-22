@@ -1,4 +1,5 @@
 import Friend from "../Models/Friend.js";
+import Message from "../Models/Message.js";
 import Request from "../Models/Request.js";
 import User from "../Models/User.js";
 
@@ -23,12 +24,15 @@ export default class UserController {
       Friend.exists({
         user: req.user.id,
         "friends": targetUser._id
-      })
-    ]);
+      })]);
 
+    // get Messages;
 
     targetUser.isRequested = Boolean(isRequested)
     targetUser.isFriend = Boolean(isFriend)
+
+
+
 
 
     return res.status(200).json({
