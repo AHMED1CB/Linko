@@ -11,16 +11,23 @@ import {
   TextField,
 } from "@mui/material";
 
-import { AttachFile, MoreVert, InsertEmoticon, Mic } from "@mui/icons-material";
+import {
+  AttachFile,
+  MoreVert,
+  InsertEmoticon,
+  Mic,
+  Send,
+} from "@mui/icons-material";
 import SideBar from "./SideBar";
 import { useParams } from "react-router-dom";
 import { useAuth } from "../app/Contexts/AuthContext";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { getFriendDetails } from "../app/Redux/Features/Friends/FriendsServices";
 import Loader from "./Loader";
 import NotFound from "./NotFound";
 import utils from "../app/Api/utils";
+import socket from "../app/SocketHandler/socket";
 
 const pulse = keyframes`
   0%, 100% { transform: scale(1); }
@@ -47,22 +54,63 @@ export default () => {
 
   const dispatch = useDispatch();
 
+  const [message, setMessage] = useState({
+    type: "TXT",
+    content: null,
+  });
+
+  const [messages, setMessages] = useState([]);
   // get Target userId
+  const targetId = currentUser.friends.find(
+    (d) => d.username === username
+  )?._id;
 
   useEffect(() => {
-    const targetId = currentUser.friends.find(
-      (d) => d.username === username
-    )._id;
-
     const getFriend = async () => {
       return await dispatch(getFriendDetails(targetId)).unwrap();
     };
-    getFriend();
+
+    if (targetId) {
+      getFriend();
+    } else {
+    }
   }, [username]);
 
-  if (statue === "Loading") return <Loader />;
-  if (statue === "Fail") return <NotFound />;
+  // socket Events
 
+  useEffect(() => {
+    if (targetFriend) {
+      setMessages(targetFriend?.messages || []);
+    }
+  }, [targetFriend]);
+
+  useEffect(() => {
+    socket.register(currentUser._id);
+
+    const OnMessage = (data) => {
+      setMessages((p) => [...p, data]);
+    };
+
+    socket.on("message", OnMessage);
+
+    return () => {
+      socket.off("message", OnMessage);
+    };
+  }, [socket]);
+
+  const SendMessage = () => {
+    const details = {
+      ...message,
+      from: currentUser._id,
+      to: targetFriend._id,
+    };
+
+    socket.message(details);
+  };
+
+  if (statue === "Fail" || !targetId) return <NotFound />;
+  if (statue === "Loading") return <Loader />;
+  
   return (
     (targetFriend && (
       <Box
@@ -174,11 +222,13 @@ export default () => {
                 gap: 2,
               }}
             >
-              {targetFriend.messages.map((msg) => {
-                const isFromMe = msg.from._id === currentUser._id;
-
+              {messages?.length === 0 && (
+                <h2 className="sad-msg"> No Messages Yet</h2>
+              )}
+              {messages.map((msg) => {
+                const isFromMe = msg.from == currentUser._id;
                 return (
-                  <Fade in={true} timeout={1400}>
+                  <Fade in={true} timeout={1400} key={msg._id}>
                     <Box
                       sx={{
                         display: "flex",
@@ -207,13 +257,13 @@ export default () => {
                         }}
                       >
                         <Typography>
-                          {message.content}
+                          {msg.content}
                           {/* Only on the start show message as text */}
                         </Typography>
                         <Typography
                           sx={{ opacity: 0.8, fontSize: "0.75rem", mt: 1 }}
                         >
-                          {message.creationDate}
+                          {msg.creationDate}
                         </Typography>
                       </Box>
                     </Box>
@@ -247,6 +297,12 @@ export default () => {
                   <InsertEmoticon />
                 </IconButton>
                 <TextField
+                  onChange={() =>
+                    setMessage({
+                      ...message,
+                      content: event.target.value.trim(),
+                    })
+                  }
                   fullWidth
                   placeholder="Type a message..."
                   variant="outlined"
@@ -271,7 +327,9 @@ export default () => {
                     },
                   }}
                 >
-                  <Mic />
+                  {(message.content && <Send onClick={SendMessage} />) || (
+                    <Mic />
+                  )}
                 </IconButton>
               </Box>
             </Fade>

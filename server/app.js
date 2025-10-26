@@ -7,7 +7,7 @@ import helmet from "helmet";
 import cors from "cors";
 import bodyParser from "body-parser";
 import connect from "./Mongose/Connection.js";
-import path from "path";
+
 
 
 
@@ -49,7 +49,16 @@ app.use(errorHandler);
 
 // SOCKET IO
 let server = http.createServer(app);
-const ioManager = new SocketController(server);
+const io = new Server(server, {
+  cors: {
+    origin: "*"
+  }
+});
+
+io.on('connection', (socket) => {
+  const ioManager = new SocketController(io, socket);
+})
+
 
 server.listen(process.env.PORT || 5000, () => {
   console.log("Server Started");

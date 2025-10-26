@@ -16,7 +16,7 @@ export default class FriendsController {
             message: "",
             error: "",
             data: {
-                friends: friends.friends
+                friends: friends?.friends || []
             }
         })
     }
