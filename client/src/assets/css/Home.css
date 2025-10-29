@@ -156,6 +156,7 @@
   margin-bottom: 8px;
   border-radius: 18px;
   position: relative;
+  height: fit-content;
 }
 
 .message-bubble.incoming {

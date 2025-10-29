@@ -14,9 +14,10 @@ import {
 import {
   AttachFile,
   MoreVert,
-  InsertEmoticon,
   Mic,
   Send,
+  Image,
+  Close,
 } from "@mui/icons-material";
 import SideBar from "./SideBar";
 import { useParams } from "react-router-dom";
@@ -56,10 +57,16 @@ export default () => {
 
   const [message, setMessage] = useState({
     type: "TXT",
-    content: null,
+    content: "",
   });
 
   const [messages, setMessages] = useState([]);
+
+  const [imgFile, setImgFile] = useState({
+    file: null,
+    view: null,
+  });
+
   // get Target userId
   const targetId = currentUser.friends.find(
     (d) => d.username === username
@@ -99,6 +106,18 @@ export default () => {
   }, [socket]);
 
   const SendMessage = () => {
+    // check if there is images;
+
+    if (imgFile) {
+      socket.message({
+        type: "IMG",
+        content: imgFile.file,
+        from: currentUser._id,
+        to: targetFriend._id,
+      });
+      setImgFile({ file: null, view: null });
+    }
+
     const details = {
       ...message,
       from: currentUser._id,
@@ -106,11 +125,48 @@ export default () => {
     };
 
     socket.message(details);
+
+    setMessage({ type: "TXT", content: "" });
+  };
+
+  const handleImgFileChange = (event) => {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+    const bufferReader = new FileReader();
+
+    reader.onload = (ev) => {
+      setImgFile((e) => {
+        return {
+          ...e,
+          view: ev.target.result,
+        };
+      });
+    };
+
+    bufferReader.onload = (e) => {
+      const arrayBuffer = e.target.result;
+
+      const base64String = btoa(
+        new Uint8Array(arrayBuffer).reduce(
+          (data, byte) => data + String.fromCharCode(byte),
+          ""
+        )
+      );
+
+      setImgFile((e) => {
+        return {
+          ...e,
+          file: base64String,
+        };
+      });
+    };
+    reader.readAsDataURL(file);
+    bufferReader.readAsArrayBuffer(file);
   };
 
   if (statue === "Fail" || !targetId) return <NotFound />;
   if (statue === "Loading") return <Loader />;
-  
+
   return (
     (targetFriend && (
       <Box
@@ -122,6 +178,9 @@ export default () => {
         <SideBar />
 
         <Slide
+          style={{
+            position: "relative",
+          }}
           direction="left"
           in={true}
           timeout={800}
@@ -256,10 +315,15 @@ export default () => {
                           },
                         }}
                       >
-                        <Typography>
-                          {msg.content}
-                          {/* Only on the start show message as text */}
-                        </Typography>
+                        {msg.type == "IMG" && (
+                          <img
+                            src={utils.url + "/storage/imgs/" + msg.content}
+                            className="img-msg"
+                          />
+                        )}
+                        {msg.type == "TXT" && (
+                          <Typography>{msg.content}</Typography>
+                        )}
                         <Typography
                           sx={{ opacity: 0.8, fontSize: "0.75rem", mt: 1 }}
                         >
@@ -271,6 +335,20 @@ export default () => {
                 );
               })}
             </Box>
+
+            {/* Image Area */}
+
+            {imgFile?.view && (
+              <Box className="img-file-shower">
+                <IconButton
+                  className="cancelImgFile"
+                  onClick={() => setImgFile({ file: null, view: null })}
+                >
+                  <Close />
+                </IconButton>
+                <img src={imgFile.view} className="img-file" />
+              </Box>
+            )}
 
             {/* Input */}
             <Fade in={true} timeout={2200}>
@@ -294,7 +372,17 @@ export default () => {
                     },
                   }}
                 >
-                  <InsertEmoticon />
+                  <label htmlFor="imgFile" style={{ cursor: "pointer " }}>
+                    <Image />
+                  </label>
+
+                  <input
+                    type="file"
+                    hidden
+                    id="imgFile"
+                    accept="image/*"
+                    onChange={handleImgFileChange}
+                  />
                 </IconButton>
                 <TextField
                   onChange={() =>
@@ -303,6 +391,7 @@ export default () => {
                       content: event.target.value.trim(),
                     })
                   }
+                  value={message.content}
                   fullWidth
                   placeholder="Type a message..."
                   variant="outlined"
@@ -327,9 +416,9 @@ export default () => {
                     },
                   }}
                 >
-                  {(message.content && <Send onClick={SendMessage} />) || (
-                    <Mic />
-                  )}
+                  {((message.content || imgFile.view) && (
+                    <Send onClick={SendMessage} />
+                  )) || <Mic />}
                 </IconButton>
               </Box>
             </Fade>

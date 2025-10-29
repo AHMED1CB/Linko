@@ -114,3 +114,31 @@ a:not(header a) {
   margin-top: 90px;
   color: darkgray;
 }
+
+.img-file-shower{
+  position: absolute;
+  bottom: 115px;
+  left: 40px;
+  width: fit-content;
+  border: 1px solid #fff;
+  border-radius: 8px;
+  padding: 4px;
+  overflow: hidden;
+}
+
+.img-file-shower img{
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+}
+
+.cancelImgFile{
+  position: absolute !important;
+  right: 0;
+}
+
+.img-msg{
+  object-fit: cover;
+  width: 250px;
+  height: 250px;
+}

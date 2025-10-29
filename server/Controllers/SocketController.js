@@ -1,5 +1,7 @@
+import { randomInt } from "crypto";
 import Message from "../Models/Message.js";
-
+import fs from 'fs'
+import path from 'path'
 
 export default class SocketController {
 
@@ -52,19 +54,62 @@ export default class SocketController {
 
     async HandleSendMessage(data) {
 
-        if (!data || !data.from || !data.to || !data.content.trim()) return;
-
+        if (!data || !data.from || !data.to || !data.content) return;
+        if (typeof data.content == 'string' && !data.content.trim()) return;
 
         const senderId = SocketController.Users.get(data.from.trim());
         const reciverId = SocketController.Users.get(data.to.trim());
 
 
-        if ((data?.type === 'TXT' || null)) {
+        if ((data?.type === 'TXT' || null)) { // TXT IS THE DEFAULT
             await this.sendTxTMessage(data, senderId, reciverId)
+        } else if (data.type === 'IMG') {
+            this.sendImgMessage(data, senderId, reciverId)
         }
 
 
     }
+
+    async sendImgMessage(data, sender, reciver) {
+
+        let details = {
+            type: 'IMG',
+            content: null,
+            from: data.from,
+            to: data.to
+        }
+
+        let imgFileContent = data.content;
+        imgFileContent = Buffer.from(imgFileContent, 'base64')
+
+        const imgsPath = path.join(process.cwd(), "Storage/imgs");
+        const fileName = Date.now() + randomInt(999999) + '__img.png'
+
+        if (!fs.existsSync(imgsPath)) {
+            fs.mkdirSync(imgsPath, { recursive: true })
+        }
+
+        fs.writeFileSync(path.join(imgsPath, fileName), imgFileContent);
+
+        details.content = fileName;
+
+
+        // save image message on database (path)
+
+        const message = await Message.create(details);
+
+        if (sender) {
+
+            this.sendTo(sender, 'message', message)
+
+        }
+        if (reciver) {
+            this.sendTo(reciver, 'message', message)
+
+        }
+
+    }
+
     // Socket Ids
     async sendTxTMessage(data, sender, reciver) {
 
@@ -84,12 +129,11 @@ export default class SocketController {
 
 
                 if (sender) {
-                    this.io.to(sender).emit('message', message);
+                    this.sendTo(sender, 'message', message);
                 }
 
                 if (reciver) {
-                    this.io.to(reciver).emit('message', message)
-
+                    this.sendTo(reciver, 'message', message)
                 }
 
 
@@ -101,6 +145,12 @@ export default class SocketController {
         }
 
 
+    }
+
+
+
+    sendTo(id, event, data) {
+        this.io.to(id).emit(event, data);
     }
 
 }
