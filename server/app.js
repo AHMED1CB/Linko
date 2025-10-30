@@ -56,7 +56,7 @@ const io = new Server(server, {
 });
 
 io.on('connection', (socket) => {
-  const ioManager = new SocketController(io, socket);
+  new SocketController(io, socket);
 })
 
 

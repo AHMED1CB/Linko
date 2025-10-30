@@ -65,8 +65,49 @@ export default class SocketController {
             await this.sendTxTMessage(data, senderId, reciverId)
         } else if (data.type === 'IMG') {
             this.sendImgMessage(data, senderId, reciverId)
+        } else if (data.type === 'VOI') {
+            this.sendVoiceMessage(data, senderId, reciverId)
         }
 
+
+    }
+
+    async sendVoiceMessage(data, sender, reciver) {
+
+
+        let details = {
+            from: data.from,
+            to: data.to,
+            type: 'VOI',
+            content: null
+        }
+
+        // uploade audio file
+
+
+        const audiosPath = path.join(process.cwd(), "Storage/voices");
+        const fileName = Date.now() + randomInt(999999) + '__voi.webm'
+
+        if (!fs.existsSync(audiosPath)) {
+            fs.mkdirSync(audiosPath, { recursive: true })
+        }
+
+
+        fs.writeFileSync(path.join(audiosPath, fileName), Buffer.from(data.content));
+
+        details.content = fileName;
+
+
+        const message = await Message.create(details);
+
+        if (sender) {
+
+            this.sendTo(sender, 'message', message)
+
+        }
+        if (reciver) {
+            this.sendTo(reciver, 'message', message)
+        }
 
     }
 

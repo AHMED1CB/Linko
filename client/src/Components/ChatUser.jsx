@@ -23,12 +23,14 @@ import SideBar from "./SideBar";
 import { useParams } from "react-router-dom";
 import { useAuth } from "../app/Contexts/AuthContext";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { getFriendDetails } from "../app/Redux/Features/Friends/FriendsServices";
 import Loader from "./Loader";
 import NotFound from "./NotFound";
 import utils from "../app/Api/utils";
 import socket from "../app/SocketHandler/socket";
+import Alert from "../app/Swal/Alert";
+import VoiceMessage from "./VoiceMessage";
 
 const pulse = keyframes`
   0%, 100% { transform: scale(1); }
@@ -61,11 +63,14 @@ export default () => {
   });
 
   const [messages, setMessages] = useState([]);
-
   const [imgFile, setImgFile] = useState({
     file: null,
     view: null,
   });
+
+  const [recording, setRecording] = useState(false);
+  const mediaRecorderRef = useRef(null);
+  const audioChunks = useRef([]);
 
   // get Target userId
   const targetId = currentUser.friends.find(
@@ -95,7 +100,9 @@ export default () => {
     socket.register(currentUser._id);
 
     const OnMessage = (data) => {
-      setMessages((p) => [...p, data]);
+      if (data.from === targetFriend._id || data.from === currentUser._id) {
+        setMessages((p) => [...p, data]);
+      }
     };
 
     socket.on("message", OnMessage);
@@ -162,6 +169,47 @@ export default () => {
     };
     reader.readAsDataURL(file);
     bufferReader.readAsArrayBuffer(file);
+  };
+
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorderRef.current = new MediaRecorder(stream);
+
+      mediaRecorderRef.current.ondataavailable = (e) => {
+        audioChunks.current.push(e.data);
+      };
+
+      mediaRecorderRef.current.onstop = async () => {
+        const blob = new Blob(audioChunks.current, { type: "audio/webm" });
+
+        const arrayBuffer = await blob.arrayBuffer();
+        const buffer = new Uint8Array(arrayBuffer);
+
+        audioChunks.current = [];
+
+        const details = {
+          type: "VOI",
+          content: buffer,
+          from: currentUser._id,
+          to: targetFriend._id,
+        };
+
+        socket.message(details);
+      };
+
+      mediaRecorderRef.current.start();
+      setRecording(true);
+    } catch {
+      Alert.error("Recording Error", "Cannot Start Recording");
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current) {
+      mediaRecorderRef.current.stop();
+      setRecording(false);
+    }
   };
 
   if (statue === "Fail" || !targetId) return <NotFound />;
@@ -269,6 +317,10 @@ export default () => {
               </Box>
             </Fade>
 
+            {/* Show Recording  */}
+
+            <Box className="recording-display"></Box>
+
             {/* Messages */}
 
             <Box
@@ -324,6 +376,13 @@ export default () => {
                         {msg.type == "TXT" && (
                           <Typography>{msg.content}</Typography>
                         )}
+
+                        {msg.type == "VOI" && (
+                          <VoiceMessage
+                            src={`${utils.url}/storage/voices/${msg.content}`}
+                          />
+                        )}
+
                         <Typography
                           sx={{ opacity: 0.8, fontSize: "0.75rem", mt: 1 }}
                         >
@@ -418,7 +477,14 @@ export default () => {
                 >
                   {((message.content || imgFile.view) && (
                     <Send onClick={SendMessage} />
-                  )) || <Mic />}
+                  )) || (
+                    <Mic
+                      onMouseDown={startRecording}
+                      onMouseUp={stopRecording}
+                      onTouchStart={startRecording}
+                      onTouchEnd={stopRecording}
+                    />
+                  )}
                 </IconButton>
               </Box>
             </Fade>

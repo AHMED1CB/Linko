@@ -2,3 +2,4 @@
 node_modules
 storage/photos/*
 storage/imgs/*
+storage/voices/*
