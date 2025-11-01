@@ -46,7 +46,7 @@ app.use("/friends", authToken, Friends);
 const storagePath = path.join(process.cwd(), "Storage");
 
 app.use("/storage", (req, res, next) => {
-  if (env === "LOCL") {
+  if (env === "ENV") {
     const referer = req.get("referer");
 
     if (referer && referer.startsWith(allowedOrigin)) {
