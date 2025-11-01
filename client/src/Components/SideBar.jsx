@@ -4,7 +4,6 @@ import {
   Avatar,
   TextField,
   IconButton,
-  Badge,
   Fade,
   Slide,
   Grow,
@@ -12,9 +11,9 @@ import {
 } from "@mui/material";
 
 import { useNavigate, useParams } from "react-router-dom";
-import { keyframes, useTheme } from "@mui/material/styles";
+import { useTheme } from "@mui/material/styles";
 
-import { Search, MoreVert, Close, Check, AllOut, PortableWifiOff, Person2, Person, Person3Outlined } from "@mui/icons-material";
+import { Search, MoreVert, Close, Check } from "@mui/icons-material";
 import { useAuth } from "../app/Contexts/AuthContext";
 import utils from "../app/Api/utils";
 import { useDispatch } from "react-redux";
@@ -24,16 +23,8 @@ import {
 } from "../app/Redux/Features/Requests/RequestsServices";
 import { useLoader } from "../app/Contexts/LoaderContext";
 import { GetUserProfile } from "../app/Redux/Features/Auth/AuthServices";
-import { useState } from "react";
-const pulse = keyframes`
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-`;
-
-const slideLeft = keyframes`
-  from { transform: translateX(-20px); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
-`;
+import { useEffect, useState } from "react";
+import { slideLeft } from "../app/animations/Main";
 
 export default ({ fullWidth = false }) => {
   const theme = useTheme();
@@ -44,12 +35,28 @@ export default ({ fullWidth = false }) => {
   const dispatch = useDispatch();
   const { showLoader, hideLoader } = useLoader();
 
-  const friends = user.friends;
+  const allFrinds = user.friends;
+  const [shownFriends, setShownFriends] = useState(allFrinds);
+
+  const [searchText, setSearchText] = useState("");
 
   const [requests, setRequests] = useState(user.requests ?? []);
   const isActiveFriend = (u) => {
     return u === username;
   };
+
+  // search friends
+
+  useEffect(() => {
+    if (!searchText) {
+      setShownFriends(allFrinds);
+      return;
+    }
+
+    setShownFriends(() => {
+      return allFrinds.filter((friend) => friend.username.includes(searchText));
+    });
+  }, [searchText]);
 
   const handleAccept = async (userId) => {
     try {
@@ -126,6 +133,8 @@ export default ({ fullWidth = false }) => {
             sx={{ p: 2, borderBottom: `1px solid ${theme.palette.divider}` }}
           >
             <TextField
+              value={searchText}
+              onChange={() => setSearchText(event.target.value)}
               fullWidth
               size="small"
               placeholder="Search conversations..."
@@ -179,16 +188,15 @@ export default ({ fullWidth = false }) => {
                   }}
                 >
                   <Zoom in timeout={1000}>
-                  
-                      <Avatar
-                        sx={{
-                          bgcolor: theme.palette.primary.main,
-                          transition: "all 0.3s",
-                          "&:hover": { transform: "scale(1.1)" },
-                        }}
-                      >
-                        {senderPhoto}
-                      </Avatar>
+                    <Avatar
+                      sx={{
+                        bgcolor: theme.palette.primary.main,
+                        transition: "all 0.3s",
+                        "&:hover": { transform: "scale(1.1)" },
+                      }}
+                    >
+                      {senderPhoto}
+                    </Avatar>
                   </Zoom>
 
                   <Box sx={{ ml: 2, flex: 1 }}>
@@ -237,7 +245,7 @@ export default ({ fullWidth = false }) => {
             );
           })}
 
-          {friends.map((friend) => {
+          {shownFriends.map((friend) => {
             const friendProfilePhoto = friend.photo ? (
               <img
                 src={utils.url + "/storage/photos/" + friend.photo}
@@ -311,7 +319,7 @@ export default ({ fullWidth = false }) => {
                         fontSize: "0.85rem",
                       }}
                     >
-                      {/* {friend.messages.lastOne.text} */}
+                      {friend.lastMessage?.content?.slice(0, 30)}
                       {/* @TODO SHOW LAST MESSAGE */}
                     </Typography>
                   </Box>
@@ -329,8 +337,7 @@ export default ({ fullWidth = false }) => {
             );
           })}
 
-          {user.friends.length == 0 && <h2 className="sad-msg">You Are Alone!</h2>}
-
+          {allFrinds.length == 0 && <h2 className="sad-msg">You Are Alone!</h2>}
         </Box>
       </Box>
     </Slide>

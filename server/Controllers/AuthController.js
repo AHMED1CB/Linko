@@ -8,6 +8,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import Friend from "../Models/Friend.js";
 import Request from "../Models/Request.js";
+import Message from "../Models/Message.js";
 
 
 export default class AuthController {
@@ -123,7 +124,7 @@ export default class AuthController {
 
     const userHasFriends = await Friend.exists({ user: req.user.id });
 
-    const [friendsDoc, requests] = await Promise.all([
+    let [friendsDoc, requests] = await Promise.all([
       userHasFriends ? Friend.findOne({ user: userProfile._id })
         .select('friends -_id')
         .populate({
@@ -139,9 +140,29 @@ export default class AuthController {
       })
     ]);
 
+    userProfile.friends = []
+
+    if (friendsDoc && friendsDoc.friends) {
+      let friends = friendsDoc.friends.toObject();
+
+      for (let friend of friends) {
+
+        const lastMessage = await Message.findOne({
+          from: friend._id,
+          to: req.user.id,
+          type: 'TXT'
+        }).sort({ createdAt: -1 })
 
 
-    userProfile.friends = friendsDoc?.friends || []
+        friend._doc.lastMessage = lastMessage
+
+        // @ TODO RETURN CREATION DATE FORMATED 
+
+      }
+      userProfile.friends = friends
+    }
+
+
     userProfile.requests = requests
 
 

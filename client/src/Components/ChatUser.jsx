@@ -7,7 +7,6 @@ import {
   Typography,
   IconButton,
   useTheme,
-  keyframes,
   TextField,
 } from "@mui/material";
 
@@ -31,20 +30,7 @@ import utils from "../app/Api/utils";
 import socket from "../app/SocketHandler/socket";
 import Alert from "../app/Swal/Alert";
 import VoiceMessage from "./VoiceMessage";
-
-const pulse = keyframes`
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-`;
-
-const slideLeft = keyframes`
-  from { transform: translateX(-20px); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
-`;
-const slideRight = keyframes`
-  from { transform: translateX(20px); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
-`;
+import { pulse, slideLeft, slideRight } from "../app/animations/Main";
 
 export default () => {
   const theme = useTheme();
@@ -68,7 +54,6 @@ export default () => {
     view: null,
   });
 
-  const [recording, setRecording] = useState(false);
   const mediaRecorderRef = useRef(null);
   const audioChunks = useRef([]);
 
@@ -100,7 +85,7 @@ export default () => {
     socket.register(currentUser._id);
 
     const OnMessage = (data) => {
-      if (data.from === targetFriend._id || data.from === currentUser._id) {
+      if (data.from == targetId || data.from == currentUser._id) {
         setMessages((p) => [...p, data]);
       }
     };
@@ -111,6 +96,10 @@ export default () => {
       socket.off("message", OnMessage);
     };
   }, [socket]);
+
+  useEffect(() => {
+    Alert.configure(theme);
+  }, []);
 
   const SendMessage = () => {
     // check if there is images;
@@ -140,6 +129,11 @@ export default () => {
     const file = event.target.files[0];
     const reader = new FileReader();
     const bufferReader = new FileReader();
+
+    if (file && !file.type.startsWith("image/")) {
+      onImageError();
+      return;
+    }
 
     reader.onload = (ev) => {
       setImgFile((e) => {
@@ -171,6 +165,14 @@ export default () => {
     bufferReader.readAsArrayBuffer(file);
   };
 
+  const onImageError = () => {
+    setImgFile({
+      file: null,
+      view: null,
+    });
+    Alert.error("Image Error", "Invalid Image File Please Select Another One");
+  };
+
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -183,6 +185,10 @@ export default () => {
       mediaRecorderRef.current.onstop = async () => {
         const blob = new Blob(audioChunks.current, { type: "audio/webm" });
 
+        if (blob.size < 10_000) {
+          Alert.error("Audio Error", "Too Short Audio message");
+          return;
+        }
         const arrayBuffer = await blob.arrayBuffer();
         const buffer = new Uint8Array(arrayBuffer);
 
@@ -199,7 +205,6 @@ export default () => {
       };
 
       mediaRecorderRef.current.start();
-      setRecording(true);
     } catch {
       Alert.error("Recording Error", "Cannot Start Recording");
     }
@@ -208,7 +213,6 @@ export default () => {
   const stopRecording = () => {
     if (mediaRecorderRef.current) {
       mediaRecorderRef.current.stop();
-      setRecording(false);
     }
   };
 
@@ -405,7 +409,11 @@ export default () => {
                 >
                   <Close />
                 </IconButton>
-                <img src={imgFile.view} className="img-file" />
+                <img
+                  src={imgFile.view}
+                  className="img-file"
+                  onError={onImageError}
+                />
               </Box>
             )}
 

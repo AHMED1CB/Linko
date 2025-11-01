@@ -73,7 +73,6 @@ const ProfilePage = ({ isProfile = false }) => {
     }
   }, [user]);
 
-
   // profile data
 
   const [photo, setPhoto] = useState(null);
@@ -107,6 +106,14 @@ const ProfilePage = ({ isProfile = false }) => {
     }
   };
 
+  const onImageError = () => {
+    setUser({ ...user, photo: null });
+    Alert.error(
+      "Profile Photo Error",
+      "Invalid Profile Photo Source You Must Change it Now"
+    );
+  };
+
   if (status === "Fail" && !isProfile) {
     return <NotFound />;
   }
@@ -114,7 +121,6 @@ const ProfilePage = ({ isProfile = false }) => {
   if (!isProfile && status == "Loading") {
     return <Loader />;
   }
-
 
   return (
     user && (
@@ -143,12 +149,7 @@ const ProfilePage = ({ isProfile = false }) => {
             }}
           >
             <Box sx={{ position: "relative", display: "inline-block" }}>
-              {(user.photo && (
-                <img
-                  className="profile_photo"
-                  src={utils.url + "/storage/photos/" + user.photo}
-                />
-              )) || (
+              {
                 <Avatar
                   sx={{
                     width: 120,
@@ -159,9 +160,16 @@ const ProfilePage = ({ isProfile = false }) => {
                     "&:hover": { transform: "scale(1.15)" },
                   }}
                 >
-                  {user.username[0].toUpperCase()}
+                  {(user.photo && (
+                    <img
+                      className="profile_photo"
+                      src={utils.url + "/storage/photos/" + user.photo}
+                      onError={onImageError}
+                    />
+                  )) ||
+                    user.username[0].toUpperCase()}
                 </Avatar>
-              )}
+              }
 
               <input
                 type="file"

@@ -4,23 +4,6 @@ import Message from "../Models/Message.js";
 
 export default class FriendsController {
 
-    static async GetUserFriends(req, res) {
-        const userId = req.user.id;
-
-        const friends = await Friend.findOne({ user: userId }).populate({
-            path: "friends",
-            select: "-password"
-        });
-
-        return res.status(200).json({
-            message: "",
-            error: "",
-            data: {
-                friends: friends?.friends || []
-            }
-        })
-    }
-
     static async DeleteFriend(req, res) {
 
         const { friendId: targetFriendId } = req.params;
