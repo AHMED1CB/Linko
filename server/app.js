@@ -44,9 +44,15 @@ app.use("/friends", authToken, Friends);
 app.use("/storage", (req, res, next) => {
 
   const origin = req.get("origin") || req.get("referer");
+  const referer = req.get("referer");
 
   if (env === "PROD") {
-    if (origin && origin.startsWith(allowedOrigin)) {
+
+    if (
+      !origin && !referer ||
+      (origin && origin.startsWith(allowedOrigin)) ||
+      (referer && referer.startsWith(allowedOrigin))
+    ) {
       return express.static("./Storage")(req, res, next);
     } else {
       return res.status(403).json({
