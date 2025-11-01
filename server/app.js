@@ -42,29 +42,20 @@ app.use("/requests", authToken, Requests);
 app.use("/friends", authToken, Friends);
 
 app.use("/storage", (req, res, next) => {
-
-  const origin = req.get("origin") || req.get("referer");
-  const referer = req.get("referer");
+  const origin = req.get("origin");
 
   if (env === "PROD") {
-
-    if (
-      !origin && !referer ||
-      (origin && origin.startsWith(allowedOrigin)) ||
-      (referer && referer.startsWith(allowedOrigin))
-    ) {
-      return express.static("./Storage")(req, res, next);
+    if (origin === allowedOrigin) {
+      res.setHeader("Access-Control-Allow-Origin", allowedOrigin);
+      res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+      return express.static(path.join(process.cwd(), "Storage"))(req, res, next);
     } else {
-      return res.status(403).json({
-        message: "Access Denied",
-        status: "Fail"
-      });
+      return res.status(403).json({ message: "Access Denied", status: "Fail" });
     }
   } else {
-    return express.static("./Storage")(req, res, next);
+    return express.static(path.join(process.cwd(), "Storage"))(req, res, next);
   }
-
-})
+});
 
 // Error Handler 
 app.use(errorHandler);
