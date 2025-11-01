@@ -17,7 +17,7 @@ import Friends from "./Routes/Friends.js";
 import { errorHandler } from "./Middleware/ErrorHandler.js";
 import authToken from "./Middleware/Auth.js";
 import SocketController from "./Controllers/SocketController.js";
-
+import path from 'path'
 dotenv.config();
 
 // Connecto To Database
