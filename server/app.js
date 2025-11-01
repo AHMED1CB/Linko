@@ -17,7 +17,7 @@ import Friends from "./Routes/Friends.js";
 import { errorHandler } from "./Middleware/ErrorHandler.js";
 import authToken from "./Middleware/Auth.js";
 import SocketController from "./Controllers/SocketController.js";
-
+import path from 'path'
 dotenv.config();
 
 // Connecto To Database
@@ -43,24 +43,24 @@ app.use("/users", Users);
 app.use("/requests", authToken, Requests);
 app.use("/friends", authToken, Friends);
 
+const storagePath = path.join(process.cwd(), "Storage");
+
 app.use("/storage", (req, res, next) => {
+  if (env === "LOCL") {
+    const referer = req.get("referer");
 
-  const origin = req.get("origin") || req.get("referer");
-
-  if (env === "PROD") {
-    if (origin && origin.startsWith(allowedOrigin)) {
-      return express.static("./Storage")(req, res, next);
+    if (referer && referer.startsWith(allowedOrigin)) {
+      return express.static(storagePath)(req, res, next);
     } else {
       return res.status(403).json({
-        message: "Access Denied",
+        message: "Access Denied: Direct access not allowed",
         status: "Fail"
       });
     }
   } else {
-    return express.static("./Storage")(req, res, next);
+    return express.static(storagePath)(req, res, next);
   }
-
-})
+});
 
 // Error Handler 
 app.use(errorHandler);
