@@ -9,8 +9,6 @@ import bodyParser from "body-parser";
 import connect from "./Mongose/Connection.js";
 
 
-
-
 import Auth from "./Routes/Auth.js";
 import Users from "./Routes/Users.js";
 import Requests from "./Routes/Requests.js";
@@ -34,14 +32,33 @@ app.use(helmet());
 app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 
 
-// Routes
+const env = process.env.APP;
+const allowedOrigin = "https://linko-k9bk.onrender.com" // APP URL 
 
+// Routes
 app.use("/auth", Auth);
 app.use("/users", Users);
 app.use("/requests", authToken, Requests);
 app.use("/friends", authToken, Friends);
 
-app.use("/storage", express.static('./Storage'))
+app.use("/storage", (req, res, next) => {
+
+  const origin = req.get("origin") || req.get("referer");
+
+  if (env === "PROD") {
+    if (origin && origin.startsWith(allowedOrigin)) {
+      return express.static("./Storage")(req, res, next);
+    } else {
+      return res.status(403).json({
+        message: "Access Denied",
+        status: "Fail"
+      });
+    }
+  } else {
+    return express.static("./Storage")(req, res, next);
+  }
+
+})
 
 // Error Handler 
 app.use(errorHandler);
@@ -51,7 +68,7 @@ app.use(errorHandler);
 let server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "*"
+    origin: env === "PROD" ? allowedOrigin : "*"
   }
 });
 
