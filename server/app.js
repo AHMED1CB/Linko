@@ -17,7 +17,7 @@ import Friends from "./Routes/Friends.js";
 import { errorHandler } from "./Middleware/ErrorHandler.js";
 import authToken from "./Middleware/Auth.js";
 import SocketController from "./Controllers/SocketController.js";
-import path from 'path'
+
 dotenv.config();
 
 // Connecto To Database
@@ -34,28 +34,33 @@ app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 
 const env = process.env.APP;
 const allowedOrigin = "https://linko-k9bk.onrender.com" // APP URL 
-
 // Routes
+
+
+
 app.use("/auth", Auth);
 app.use("/users", Users);
 app.use("/requests", authToken, Requests);
 app.use("/friends", authToken, Friends);
 
 app.use("/storage", (req, res, next) => {
-  const origin = req.get("origin");
+
+  const origin = req.get("origin") || req.get("referer");
 
   if (env === "PROD") {
-    if (origin === allowedOrigin) {
-      res.setHeader("Access-Control-Allow-Origin", allowedOrigin);
-      res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
-      return express.static(path.join(process.cwd(), "Storage"))(req, res, next);
+    if (origin && origin.startsWith(allowedOrigin)) {
+      return express.static("./Storage")(req, res, next);
     } else {
-      return res.status(403).json({ message: "Access Denied", status: "Fail" });
+      return res.status(403).json({
+        message: "Access Denied",
+        status: "Fail"
+      });
     }
   } else {
-    return express.static(path.join(process.cwd(), "Storage"))(req, res, next);
+    return express.static("./Storage")(req, res, next);
   }
-});
+
+})
 
 // Error Handler 
 app.use(errorHandler);
