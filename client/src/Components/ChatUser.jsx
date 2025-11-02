@@ -41,6 +41,7 @@ export default () => {
 
   const targetFriend = useSelector((s) => s.friends.user);
   const statue = useSelector((s) => s.friends.status);
+  const messagesContinerRef = useRef(null);
 
   const dispatch = useDispatch();
 
@@ -103,6 +104,13 @@ export default () => {
   useEffect(() => {
     Alert.configure(theme);
   }, []);
+
+  useEffect(() => {
+    if (messagesContinerRef.current) {
+      messagesContinerRef.current.scrollTop =
+        messagesContinerRef.current.scrollHeight;
+    }
+  }, [messages]);
 
   const SendMessage = () => {
     // check if there is images;
@@ -252,7 +260,7 @@ export default () => {
           <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
             {/* Chat Header */}
 
-            <Fade in={true} timeout={1000}>
+            <Fade in={true} timeout={1000} className="bg-pattern">
               <Box
                 sx={{
                   p: 2,
@@ -291,15 +299,6 @@ export default () => {
                       }}
                     >
                       {targetFriend.name}
-                    </Typography>
-                    <Typography
-                      sx={{
-                        color: theme.palette.success.main,
-                        fontSize: "0.85rem",
-                      }}
-                    >
-                      Online
-                      {/* Will Add Status soon */}
                     </Typography>
                   </Box>
                 </Box>
@@ -341,6 +340,8 @@ export default () => {
             {/* Messages */}
 
             <Box
+              ref={messagesContinerRef}
+              className="bg-pattern"
               sx={{
                 flex: 1,
                 p: 2,

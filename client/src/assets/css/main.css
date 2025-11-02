@@ -2,7 +2,7 @@
   transition: background 0.2s;
 }
 
-body{
+body {
   color: var(--text);
   width: 100vw;
   height: 100vh;
@@ -63,7 +63,6 @@ a:not(header a) {
   left: 0;
   width: 100vw;
   height: 5vh;
-
 }
 
 .setting-container {
@@ -86,28 +85,26 @@ a:not(header a) {
   display: none;
 }
 
-.main-container{
-    display: flex;
-    flex-direction: column;
+.main-container {
+  display: flex;
+  flex-direction: column;
 }
 
-@media (max-width:992px) {
-
-  .chat-contents{
+@media (max-width: 992px) {
+  .chat-contents {
     width: 100% !important;
   }
 
-  .sidebar{
-    display: none !important
+  .sidebar {
+    display: none !important;
   }
 }
 
-
-.defaultSide{
+.defaultSide {
   width: 30% !important;
 }
 
-.sad-msg{
+.sad-msg {
   font-size: 32px;
   width: 100%;
   text-align: center;
@@ -115,7 +112,7 @@ a:not(header a) {
   color: darkgray;
 }
 
-.img-file-shower{
+.img-file-shower {
   position: absolute;
   bottom: 115px;
   left: 40px;
@@ -126,25 +123,29 @@ a:not(header a) {
   overflow: hidden;
 }
 
-.img-file-shower img{
+.img-file-shower img {
   width: 150px;
   height: 150px;
   object-fit: cover;
 }
 
-.cancelImgFile{
+.cancelImgFile {
   position: absolute !important;
   right: 0;
 }
 
-.img-msg{
+.img-msg {
   object-fit: cover;
   width: 250px;
   height: 250px;
 }
 
-.text-wrap{
-  word-break: break-word; 
+.text-wrap {
+  word-break: break-word;
   padding: 12px;
-  
+}
+
+.bg-pattern {
+  background-image: url('/chat.png') !important;
+  background-repeat: repeat !important  ;
 }

@@ -82,7 +82,7 @@ export default ({ fullWidth = false }) => {
   return (
     <Slide
       direction="right"
-      className={`defaultSide  ${fullWidth ? "chat-side-full" : "sidebar"}`}
+      className={`defaultSide  ${fullWidth ? "chat-side-full" : "sidebar"} `}
       in={true}
       timeout={800}
     >
@@ -110,7 +110,7 @@ export default ({ fullWidth = false }) => {
               sx={{
                 display: "flex",
                 alignItems: "center",
-                gap:2
+                gap: 2,
               }}
             >
               <div className="logo-container">

@@ -28,6 +28,7 @@ import Alert from "../app/Swal/Alert";
 import { useLoader } from "../app/Contexts/LoaderContext";
 import ImageViewer from "./ImageViewer";
 import ProfileSettings from "./ProfileSettings";
+import Converter from "../app/Helpers/TextConverter";
 
 const ProfilePage = ({ isProfile = false }) => {
   const theme = useTheme();
@@ -349,11 +350,14 @@ const ProfilePage = ({ isProfile = false }) => {
               <TextField
                 fullWidth
                 label="Username"
-                defaultValue={user.username}
+                value={user.username}
                 variant="outlined"
                 sx={{ mb: 2 }}
                 onChange={() =>
-                  setUser({ ...user, username: event.target.value })
+                  setUser({
+                    ...user,
+                    username: Converter.Username(event.target.value),
+                  })
                 }
               />
               <TextField
