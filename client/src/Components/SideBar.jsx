@@ -13,7 +13,7 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import { useTheme } from "@mui/material/styles";
 
-import { Search, MoreVert, Close, Check } from "@mui/icons-material";
+import { Search, MoreVert, Close, Check, Add } from "@mui/icons-material";
 import { useAuth } from "../app/Contexts/AuthContext";
 import utils from "../app/Api/utils";
 import { useDispatch } from "react-redux";
@@ -25,6 +25,7 @@ import { useLoader } from "../app/Contexts/LoaderContext";
 import { GetUserProfile } from "../app/Redux/Features/Auth/AuthServices";
 import { useEffect, useState } from "react";
 import { slideLeft } from "../app/animations/Main";
+import SearchFriends from "./SearchFriends";
 
 export default ({ fullWidth = false }) => {
   const theme = useTheme();
@@ -39,6 +40,7 @@ export default ({ fullWidth = false }) => {
   const [shownFriends, setShownFriends] = useState(allFrinds);
 
   const [searchText, setSearchText] = useState("");
+  const [showDialog, setShowDialog] = useState(false);
 
   const [requests, setRequests] = useState(user.requests ?? []);
   const isActiveFriend = (u) => {
@@ -124,6 +126,7 @@ export default ({ fullWidth = false }) => {
               </Typography>
             </Box>
             <IconButton
+              onClick={() => setShowDialog(!showDialog)}
               sx={{
                 color: theme.palette.text.secondary,
                 transition: "all 0.3s",
@@ -133,7 +136,7 @@ export default ({ fullWidth = false }) => {
                 },
               }}
             >
-              <MoreVert />
+              <Add />
             </IconButton>
           </Box>
         </Fade>
@@ -165,6 +168,10 @@ export default ({ fullWidth = false }) => {
             />
           </Box>
         </Fade>
+
+        {showDialog && (
+          <SearchFriends open={showDialog} setOpen={setShowDialog} />
+        )}
 
         {/* Friends List */}
         <Box sx={{ flex: 1, overflow: "auto" }}>
@@ -293,16 +300,6 @@ export default ({ fullWidth = false }) => {
                   }}
                 >
                   <Zoom in={true} timeout={1000}>
-                    {/* <Badge
-                      color="success"
-                      variant="dot"
-                      overlap="circular"
-                      sx={{
-                        "& .MuiBadge-dot": {
-                          animation: `${pulse} 2s infinite`,
-                        },
-                      }}
-                    > */}
                     <Avatar
                       sx={{
                         bgcolor: theme.palette.primary.main,
@@ -312,7 +309,6 @@ export default ({ fullWidth = false }) => {
                     >
                       {friendProfilePhoto}
                     </Avatar>
-                    {/* </Badge> */}
                   </Zoom>
                   <Box sx={{ ml: 2, flex: 1 }}>
                     <Typography
@@ -331,7 +327,6 @@ export default ({ fullWidth = false }) => {
                       }}
                     >
                       {friend.lastMessage?.content?.slice(0, 30)}
-                      {/* @TODO SHOW LAST MESSAGE */}
                     </Typography>
                   </Box>
                   <Typography

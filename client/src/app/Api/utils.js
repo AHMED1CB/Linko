@@ -7,8 +7,9 @@ const utils = {
             profile: "/auth/profile",
             user: "/users",
             updateProfile: "/auth/profile/update",
-            requests: "/requests", // dynamic id here + '/request'
-            friend: "/friends", // dynamic id here + '/request'
+            requests: "/requests",
+            friend: "/friends",
+            'friends.search': "/friends/search",
 
             getRequestPath: (name, ...more) => {
                 return utils.url + utils.server.paths[name] + '/' + more.join('/');

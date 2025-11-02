@@ -1,6 +1,7 @@
 import Friend from "../Models/Friend.js";
 import User from "../Models/User.js";
 import Message from "../Models/Message.js";
+import Request from "../Models/Request.js";
 
 export default class FriendsController {
 
@@ -93,6 +94,45 @@ export default class FriendsController {
                 friend: friendData
             }
         })
+    }
+    static async searchByUserName(req, res) {
+        const { username } = req.params;
+        const currentUserId = req.user.id;
+        try {
+
+
+            if (!username || username.trim() === "") {
+                return res.status(400).json({ status: 'Fail', error: "Username is Requied", message: "Username is required" });
+            }
+
+            const userSentRequests = await Request.find({ from: req.user.id }).select("to");
+            const excludedIds = userSentRequests.map(r => r.to.toString());
+
+            const regex = new RegExp(username, "i");
+            const users = await User.find({
+                username: { $regex: regex },
+                _id: { $ne: currentUserId, $nin: excludedIds },
+            }).select("-password");
+
+
+
+            return res.status(200).json({
+                message: '',
+                error: 'null',
+                status: 'Successs',
+                data: {
+                    users
+                }
+            });
+        } catch (error) {
+            console.log(error)
+            return res.status(400).json({
+                message: 'Invalid Search Query',
+                error: 'Invalid Search Query',
+                status: 'Fail',
+                data: null
+            });
+        }
     }
 
 }

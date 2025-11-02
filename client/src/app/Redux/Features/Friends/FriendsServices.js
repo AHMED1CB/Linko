@@ -21,3 +21,22 @@ export const getFriendDetails = createAsyncThunk('friend/getDetails', async (id,
     }
 
 })
+
+
+
+export const searchForFriends = createAsyncThunk('friends/search', async (query, { rejectWithValue }) => {
+    try {
+
+        const response = await axios.get(utils.server.paths.getRequestPath('friends.search', query), {
+            headers: {
+                Authorization: Cookie.get('authorization')
+            }
+        });
+
+
+        return response.data;
+    } catch (error) {
+        return rejectWithValue(error)
+    }
+
+})

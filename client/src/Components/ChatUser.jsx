@@ -55,11 +55,10 @@ export default () => {
     file: null,
     view: null,
   });
+  const [currentImage, setCurrentImage] = useState(null);
 
   const mediaRecorderRef = useRef(null);
   const audioChunks = useRef([]);
-
-  const [currentImage, setCurrentImage] = useState(null);
 
   // get Target userId
   const targetId = currentUser.friends.find(

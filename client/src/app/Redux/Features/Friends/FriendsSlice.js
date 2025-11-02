@@ -1,11 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { getFriendDetails } from "./FriendsServices";
+import { getFriendDetails, searchForFriends } from "./FriendsServices";
 
 const FriendsSlice = createSlice({
     name: "friends",
     initialState: {
         friendData: null,
-        status: "Loading"
+        status: "Loading",
+        results: []
     },
     reducers: {
 
@@ -21,6 +22,9 @@ const FriendsSlice = createSlice({
         }).addCase(getFriendDetails.fulfilled, (s, a) => {
             s.user = a.payload.data.friend ?? null
             s.status = 'Success';
+        })
+        b.addCase(searchForFriends.fulfilled, (s, a) => {
+            s.results = a.payload.data.users;
         })
 
     }
