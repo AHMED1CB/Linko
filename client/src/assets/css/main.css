@@ -67,7 +67,7 @@ a:not(header a) {
 }
 
 .setting-container {
-  width: 100vw;
+  width: 100%;
 }
 
 @keyframes pulse {
@@ -141,4 +141,10 @@ a:not(header a) {
   object-fit: cover;
   width: 250px;
   height: 250px;
+}
+
+.text-wrap{
+  word-break: break-word; 
+  padding: 12px;
+  
 }

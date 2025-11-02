@@ -1,12 +1,10 @@
 // Imports
 import express from "express";
-import dotenv from "dotenv";
 import http from "http";
 import { Server } from "socket.io";
 import helmet from "helmet";
 import cors from "cors";
 import bodyParser from "body-parser";
-import connect from "./Mongose/Connection.js";
 
 
 import Auth from "./Routes/Auth.js";
@@ -18,10 +16,10 @@ import { errorHandler } from "./Middleware/ErrorHandler.js";
 import authToken from "./Middleware/Auth.js";
 import SocketController from "./Controllers/SocketController.js";
 import path from 'path'
-dotenv.config();
+import init from "./init.js";
 
-// Connecto To Database
-connect();
+// INITIALIZE
+init()
 
 // EXPRESS
 const app = express();
@@ -34,9 +32,9 @@ app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 
 const env = process.env.APP;
 const allowedOrigin = "https://linko-k9bk.onrender.com" // APP URL 
+
+
 // Routes
-
-
 
 app.use("/auth", Auth);
 app.use("/users", Users);

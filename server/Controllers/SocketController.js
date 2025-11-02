@@ -88,10 +88,6 @@ export default class SocketController {
         const audiosPath = path.join(process.cwd(), "Storage/voices");
         const fileName = Date.now() + randomInt(999999) + '__voi.webm'
 
-        if (!fs.existsSync(audiosPath)) {
-            fs.mkdirSync(audiosPath, { recursive: true })
-        }
-
 
         fs.writeFileSync(path.join(audiosPath, fileName), Buffer.from(data.content));
 
@@ -125,10 +121,6 @@ export default class SocketController {
 
         const imgsPath = path.join(process.cwd(), "Storage/imgs");
         const fileName = Date.now() + randomInt(999999) + '__img.png'
-
-        if (!fs.existsSync(imgsPath)) {
-            fs.mkdirSync(imgsPath, { recursive: true })
-        }
 
         fs.writeFileSync(path.join(imgsPath, fileName), imgFileContent);
 

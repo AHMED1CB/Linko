@@ -1,6 +1,6 @@
 import { Box, BottomNavigation, BottomNavigationAction } from "@mui/material";
 
-import { Home, Person, Settings } from "@mui/icons-material";
+import { Home, Person} from "@mui/icons-material";
 
 import { useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
@@ -9,7 +9,7 @@ import { AuthProvider } from "../../app/Contexts/AuthContext";
 export default () => {
   const go = useNavigate();
   const { pathname: location } = useLocation();
-  const locations = ["/", "/profile", "/settings"];
+  const locations = ["/", "/profile"];
   let currentLocation = locations.indexOf(location);
 
   if (currentLocation == -1) {
@@ -49,11 +49,6 @@ export default () => {
             label="Profile"
             icon={<Person />}
             onClick={() => go("/profile")}
-          />
-          <BottomNavigationAction
-            label="Settings"
-            icon={<Settings />}
-            onClick={() => go("/settings")}
           />
         </BottomNavigation>
       </Box>

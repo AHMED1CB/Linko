@@ -7,8 +7,6 @@ import SideBar from "./SideBar";
 const HomePage = () => {
   const theme = useTheme();
 
-
-
   return (
     <Box
       sx={{
@@ -18,7 +16,7 @@ const HomePage = () => {
       }}
     >
       {/* Sidebar */}
-      <SideBar fullWidth={true}/>
+      <SideBar fullWidth={true} />
 
       <Box className="welcome-msg">
         <img src="/logo.svg" alt="" />

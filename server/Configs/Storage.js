@@ -7,10 +7,6 @@ import fs from 'fs';
 const storagePath = path.join(process.cwd(), "Storage/photos");
 
 
-if (!fs.existsSync(storagePath)) {
-    fs.mkdirSync(storagePath, { recursive: true })
-}
-
 const userPhotosStorage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, storagePath)

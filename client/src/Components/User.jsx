@@ -25,6 +25,9 @@ import { UpdateUserProfile } from "../app/Redux/Features/Auth/AuthServices";
 import utils from "../app/Api/utils";
 import { sendRequest } from "../app/Redux/Features/Requests/RequestsServices";
 import Alert from "../app/Swal/Alert";
+import { useLoader } from "../app/Contexts/LoaderContext";
+import ImageViewer from "./ImageViewer";
+import ProfileSettings from "./ProfileSettings";
 
 const ProfilePage = ({ isProfile = false }) => {
   const theme = useTheme();
@@ -43,6 +46,8 @@ const ProfilePage = ({ isProfile = false }) => {
   const targetUser = useSelector((state) => state.users.user); // The Target User
 
   const status = useSelector((state) => state.users.status);
+
+  const { showLoader, hideLoader } = useLoader();
 
   const dispatch = useDispatch();
   useEffect(() => {
@@ -76,6 +81,7 @@ const ProfilePage = ({ isProfile = false }) => {
   // profile data
 
   const [photo, setPhoto] = useState(null);
+  const [showPhoto, setShowPhoto] = useState(null);
 
   const updateProfileData = async () => {
     // update data
@@ -84,17 +90,19 @@ const ProfilePage = ({ isProfile = false }) => {
     profileData.append("name", user.name);
     profileData.append("bio", user.bio ?? "No Bio");
 
-    if (photo) {
+    if (photo && photo.type.startsWith("image/")) {
       profileData.append("photo", photo);
     }
 
     try {
+      showLoader();
       await dispatch(UpdateUserProfile(profileData)).unwrap();
     } catch (err) {
       let error = err?.response?.data?.error || "Something Went Wrong";
       Alert.error("Invalid User Data", error);
     } finally {
       setEditOpen(false);
+      hideLoader();
     }
   };
 
@@ -112,6 +120,21 @@ const ProfilePage = ({ isProfile = false }) => {
       "Profile Photo Error",
       "Invalid Profile Photo Source You Must Change it Now"
     );
+  };
+
+  const handlePhotoChanged = () => {
+    const file = event.target.files[0];
+
+    if (file && file.type.startsWith("image/")) {
+      setPhoto(file);
+      setEditOpen(true);
+    } else {
+      setEditOpen(false);
+      Alert.error(
+        "Image Error",
+        "Invalid Image Source Please Select Another one"
+      );
+    }
   };
 
   if (status === "Fail" && !isProfile) {
@@ -165,6 +188,7 @@ const ProfilePage = ({ isProfile = false }) => {
                       className="profile_photo"
                       src={utils.url + "/storage/photos/" + user.photo}
                       onError={onImageError}
+                      onClick={() => setShowPhoto(true)}
                     />
                   )) ||
                     user.username[0].toUpperCase()}
@@ -176,10 +200,7 @@ const ProfilePage = ({ isProfile = false }) => {
                 id="profile-image"
                 accept="image/*"
                 style={{ display: "none" }}
-                onChange={() => {
-                  setPhoto(event.target.files[0]);
-                  setEditOpen(true);
-                }}
+                onChange={handlePhotoChanged}
               />
 
               <label htmlFor="profile-image" hidden={!isProfile}>
@@ -261,11 +282,6 @@ const ProfilePage = ({ isProfile = false }) => {
               label: "Bio",
               value: user.bio ?? "No Bios",
             },
-            {
-              label: "Status",
-              value: "Online",
-              color: theme.palette.success.main,
-            },
           ].map((item, index) => (
             <Grow in={animate} timeout={700 + index * 200} key={index}>
               <Box
@@ -285,14 +301,18 @@ const ProfilePage = ({ isProfile = false }) => {
                   {item.label}
                 </Typography>
                 <Typography
+                  className="text-wrap"
                   sx={{ color: item.color || theme.palette.text.secondary }}
                 >
-                  {item.value}
+                  {item.value.slice(0, 255)}
+                  {item.value.length > 255 && "..."}
                 </Typography>
               </Box>
             </Grow>
           ))}
         </Stack>
+
+        {isProfile && <ProfileSettings />}
 
         <Modal open={editOpen} onClose={() => setEditOpen(false)}>
           <Slide direction="up" in={editOpen} mountOnEnter unmountOnExit>
@@ -373,6 +393,13 @@ const ProfilePage = ({ isProfile = false }) => {
             </Box>
           </Slide>
         </Modal>
+
+        {showPhoto && (
+          <ImageViewer
+            image={`${utils.url}/storage/photos/${user.photo}`}
+            setImage={setShowPhoto}
+          />
+        )}
       </Box>
     )
   );

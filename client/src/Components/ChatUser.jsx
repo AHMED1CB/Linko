@@ -31,6 +31,7 @@ import socket from "../app/SocketHandler/socket";
 import Alert from "../app/Swal/Alert";
 import VoiceMessage from "./VoiceMessage";
 import { pulse, slideLeft, slideRight } from "../app/animations/Main";
+import ImageViewer from "./ImageViewer";
 
 export default () => {
   const theme = useTheme();
@@ -56,6 +57,8 @@ export default () => {
 
   const mediaRecorderRef = useRef(null);
   const audioChunks = useRef([]);
+
+  const [currentImage, setCurrentImage] = useState(null);
 
   // get Target userId
   const targetId = currentUser.friends.find(
@@ -175,7 +178,15 @@ export default () => {
 
   const startRecording = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+          channelCount: 1,
+          sampleRate: 44100,
+        },
+      });
       mediaRecorderRef.current = new MediaRecorder(stream);
 
       mediaRecorderRef.current.ondataavailable = (e) => {
@@ -185,7 +196,7 @@ export default () => {
       mediaRecorderRef.current.onstop = async () => {
         const blob = new Blob(audioChunks.current, { type: "audio/webm" });
 
-        if (blob.size < 10_000) {
+        if (blob.size < 2_000) {
           Alert.error("Audio Error", "Too Short Audio message");
           return;
         }
@@ -321,9 +332,11 @@ export default () => {
               </Box>
             </Fade>
 
-            {/* Show Recording  */}
+            {/* image Viewer */}
 
-            <Box className="recording-display"></Box>
+            {currentImage && (
+              <ImageViewer image={currentImage} setImage={setCurrentImage} />
+            )}
 
             {/* Messages */}
 
@@ -375,6 +388,11 @@ export default () => {
                           <img
                             src={utils.url + "/storage/imgs/" + msg.content}
                             className="img-msg"
+                            onClick={() =>
+                              setCurrentImage(
+                                utils.url + "/storage/imgs/" + msg.content
+                              )
+                            }
                           />
                         )}
                         {msg.type == "TXT" && (

@@ -10,7 +10,6 @@ import Register from "./Components/Register";
 import AppLayout from "./Components/Layouts/AppLayout";
 import Login from "./Components/Login";
 import HomePage from "./Components/HomePage";
-import SettingsPage from "./Components/Settings";
 import ChatLayout from "./Components/Layouts/ChatLayout";
 import UserPage from "./Components/User";
 import NotFound from "./Components/NotFound";
@@ -43,7 +42,6 @@ function App() {
 
               <Route path="/" element={<ChatLayout />}>
                 <Route index element={<HomePage />} />
-                <Route path="settings" element={<SettingsPage />} />
                 <Route path="profile" element={<UserPage isProfile={true} />} />
                 <Route path="user/:username" element={<UserPage />} />
 

@@ -106,12 +106,23 @@ export default ({ fullWidth = false }) => {
               justifyContent: "space-between",
             }}
           >
-            <Typography
-              variant="h6"
-              sx={{ color: theme.palette.text.primary, fontWeight: 600 }}
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap:2
+              }}
             >
-              Messages
-            </Typography>
+              <div className="logo-container">
+                <img src="/logo.svg" className="logo" />
+              </div>
+              <Typography
+                variant="h6"
+                sx={{ color: theme.palette.text.primary, fontWeight: 600 }}
+              >
+                Messages
+              </Typography>
+            </Box>
             <IconButton
               sx={{
                 color: theme.palette.text.secondary,
