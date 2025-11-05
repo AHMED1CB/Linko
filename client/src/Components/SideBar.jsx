@@ -364,7 +364,7 @@ export default ({ fullWidth = false }) => {
                   </Typography>
 
                   <Box className="friend-action">
-                    <IconButton sx={{scale:.7}} onClick={() => handleDeleteFriend(friend._id)}>
+                    <IconButton size="small" onClick={() => handleDeleteFriend(friend._id)}>
                       <Delete
                         sx={{
                           color: theme.palette.error.main,

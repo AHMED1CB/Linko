@@ -17,6 +17,7 @@ import {
   Send,
   Image,
   Close,
+  Delete,
 } from "@mui/icons-material";
 import SideBar from "./SideBar";
 import { useParams } from "react-router-dom";
@@ -92,11 +93,18 @@ export default () => {
         setMessages((p) => [...p, data]);
       }
     };
+    const OnDeleteMessage = (data) => {
+      setMessages((prevMessages) =>
+        prevMessages.filter((m) => m._id !== data.messageId)
+      );
+    };
 
     socket.on("message", OnMessage);
+    socket.on("deleteMessage", OnDeleteMessage);
 
     return () => {
       socket.off("message", OnMessage);
+      socket.off("deleteMessafe", OnDeleteMessage);
     };
   }, [socket]);
 
@@ -234,6 +242,21 @@ export default () => {
     }
   };
 
+  const deleteMessage = (id) => {
+    try {
+      socket.emit("deleteMessage", {
+        from: currentUser._id,
+        to: targetFriend._id,
+        messageId: id,
+      });
+    } catch {
+      Alert.error(
+        "Message Error",
+        "Something Went Wrong WHile deleteing the message"
+      );
+    }
+  };
+
   if (statue === "Fail" || !targetId) return <NotFound />;
   if (statue === "Loading") return <Loader />;
 
@@ -366,6 +389,20 @@ export default () => {
                         } 0.6s ease-out`,
                       }}
                     >
+                      {isFromMe && (
+                        <IconButton
+                          className="delete-btn"
+                          size="small"
+                          onClick={() => deleteMessage(msg._id)}
+                        >
+                          <Delete
+                            fontSize="small"
+                            sx={{
+                              color: theme.palette.error.main,
+                            }}
+                          />
+                        </IconButton>
+                      )}
                       <Box
                         sx={{
                           maxWidth: "70%",

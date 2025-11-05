@@ -149,3 +149,8 @@ a:not(header a) {
   background-image: url('/chat.png') !important;
   background-repeat: repeat !important  ;
 }
+.delete-btn{
+  height: fit-content;
+  padding: 8px;
+  margin: 8px !important;
+}

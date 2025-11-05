@@ -24,6 +24,11 @@ export default class SocketController {
                 action: 'HandleSendMessage'
 
             },
+            {
+                name: 'deleteMessage',
+                action: 'HandleDeleteMessage'
+
+            },
         ]
 
 
@@ -180,7 +185,40 @@ export default class SocketController {
 
     }
 
+    async HandleDeleteMessage(data) {
+        if (!data || !(data.messageId || data.from || data.to))return;
 
+        const messageCreator = data.from;
+        const messageReciver = data.to;
+        const messageId = data.messageId;
+
+
+        // delete message;
+
+        const deleteMessage = await Message.deleteOne({
+            from: messageCreator,
+            to: messageReciver,
+            _id: messageId
+        });
+
+
+
+        const senderId = SocketController.Users.get(data.from.trim());
+        const reciverId = SocketController.Users.get(data.to.trim());
+
+
+        if (deleteMessage) {
+            this.sendTo(senderId, 'deleteMessage', {
+                messageId: messageId,
+            })
+            this.sendTo(reciverId, 'deleteMessage', {
+                messageId: messageId,
+            })
+        }
+
+
+
+    }
 
     sendTo(id, event, data) {
         this.io.to(id).emit(event, data);
