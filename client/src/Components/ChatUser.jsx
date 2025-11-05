@@ -129,16 +129,19 @@ export default () => {
         from: currentUser._id,
         to: targetFriend._id,
       });
+
       setImgFile({ file: null, view: null });
     }
 
-    const details = {
-      ...message,
-      from: currentUser._id,
-      to: targetFriend._id,
-    };
+    setTimeout(() => {
+      const details = {
+        ...message,
+        from: currentUser._id,
+        to: targetFriend._id,
+      };
 
-    socket.message(details);
+      socket.message(details);
+    }, 100);
 
     setMessage({ type: "TXT", content: "" });
   };
@@ -510,7 +513,7 @@ export default () => {
                   onChange={() =>
                     setMessage({
                       ...message,
-                      content: event.target.value.trim(),
+                      content: event.target.value,
                     })
                   }
                   value={message.content}

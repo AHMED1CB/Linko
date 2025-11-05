@@ -1,5 +1,8 @@
 * {
   transition: background 0.2s;
+
+  /* because it doesnt work with body */
+  font-family: "Tajawal", sans-serif !important;
 }
 
 body {
@@ -146,10 +149,10 @@ a:not(header a) {
 }
 
 .bg-pattern {
-  background-image: url('/chat.png') !important;
+  background-image: url("/chat.png") !important;
   background-repeat: repeat !important  ;
 }
-.delete-btn{
+.delete-btn {
   height: fit-content;
   padding: 8px;
   margin: 8px !important;
