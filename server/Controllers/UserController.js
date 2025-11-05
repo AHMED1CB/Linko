@@ -1,5 +1,4 @@
 import Friend from "../Models/Friend.js";
-import Message from "../Models/Message.js";
 import Request from "../Models/Request.js";
 import User from "../Models/User.js";
 

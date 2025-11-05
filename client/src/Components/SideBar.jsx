@@ -13,7 +13,7 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import { useTheme } from "@mui/material/styles";
 
-import { Search, MoreVert, Close, Check, Add } from "@mui/icons-material";
+import { Search, Close, Check, Add, Delete } from "@mui/icons-material";
 import { useAuth } from "../app/Contexts/AuthContext";
 import utils from "../app/Api/utils";
 import { useDispatch } from "react-redux";
@@ -26,6 +26,8 @@ import { GetUserProfile } from "../app/Redux/Features/Auth/AuthServices";
 import { useEffect, useState } from "react";
 import { slideLeft } from "../app/animations/Main";
 import SearchFriends from "./SearchFriends";
+import Alert from "../app/Swal/Alert";
+import { deleteFriend } from "../app/Redux/Features/Friends/FriendsServices";
 
 export default ({ fullWidth = false }) => {
   const theme = useTheme();
@@ -48,6 +50,10 @@ export default ({ fullWidth = false }) => {
   };
 
   // search friends
+
+  useEffect(() => {
+    Alert.configure(theme);
+  }, []);
 
   useEffect(() => {
     if (!searchText) {
@@ -78,6 +84,22 @@ export default ({ fullWidth = false }) => {
       setRequests(requests.filter((r) => r.from._id !== userId));
     } finally {
       hideLoader();
+    }
+  };
+
+  const handleDeleteFriend = async (id) => {
+    const isSure = await Alert.askOkCancel(
+      "Sure?",
+      "Make Sure Thats You Want to Delete Friend"
+    );
+
+    if (isSure) {
+      try {
+        await dispatch(deleteFriend(id)).unwrap();
+        location.reload();
+      } catch {
+        Alert.error("Error", "Something Went Wrong");
+      }
     }
   };
 
@@ -273,12 +295,7 @@ export default ({ fullWidth = false }) => {
               friend.name[0].toUpperCase()
             );
             return (
-              <Grow
-                key={friend._id}
-                onClick={() => go(`/user/${friend.username}/chat`)}
-                in={true}
-                timeout={800}
-              >
+              <Grow key={friend._id} in={true} timeout={800}>
                 <Box
                   sx={{
                     p: 2,
@@ -297,9 +314,14 @@ export default ({ fullWidth = false }) => {
                       transform: "translateX(5px)",
                       boxShadow: `0 4px 12px ${theme.palette.primary.main}20`,
                     },
+                    gap: 2,
                   }}
                 >
-                  <Zoom in={true} timeout={1000}>
+                  <Zoom
+                    in={true}
+                    timeout={1000}
+                    onClick={() => go(`/user/${friend.username}/chat`)}
+                  >
                     <Avatar
                       sx={{
                         bgcolor: theme.palette.primary.main,
@@ -310,7 +332,10 @@ export default ({ fullWidth = false }) => {
                       {friendProfilePhoto}
                     </Avatar>
                   </Zoom>
-                  <Box sx={{ ml: 2, flex: 1 }}>
+                  <Box
+                    sx={{ ml: 2, flex: 1 }}
+                    onClick={() => go(`/user/${friend.username}/chat`)}
+                  >
                     <Typography
                       sx={{
                         color: theme.palette.text.primary,
@@ -335,9 +360,18 @@ export default ({ fullWidth = false }) => {
                       fontSize: "0.75rem",
                     }}
                   >
-                    {/* {friend.messages.lastOne.time} */}
-                    {/* @TODO SHOW LAST MESSAGE DATE */}
+                    {friend.lastMessage?.creationDate}
                   </Typography>
+
+                  <Box className="friend-action">
+                    <IconButton sx={{scale:.7}} onClick={() => handleDeleteFriend(friend._id)}>
+                      <Delete
+                        sx={{
+                          color: theme.palette.error.main,
+                        }}
+                      />
+                    </IconButton>
+                  </Box>
                 </Box>
               </Grow>
             );

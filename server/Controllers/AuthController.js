@@ -9,7 +9,7 @@ import jwt from "jsonwebtoken";
 import Friend from "../Models/Friend.js";
 import Request from "../Models/Request.js";
 import Message from "../Models/Message.js";
-
+import moment from "moment";
 
 export default class AuthController {
   static async Register(req, res) {
@@ -147,16 +147,20 @@ export default class AuthController {
 
       for (let friend of friends) {
 
-        const lastMessage = await Message.findOne({
+        let lastMessage = await Message.findOne({
           from: friend._id,
           to: req.user.id,
           type: 'TXT'
         }).sort({ createdAt: -1 })
 
 
+        if (lastMessage) {
+          lastMessage = lastMessage.toObject()
+          lastMessage.creationDate = moment(lastMessage.createdAt).fromNow()
+        }
+
         friend._doc.lastMessage = lastMessage
 
-        // @ TODO RETURN CREATION DATE FORMATED 
 
       }
       userProfile.friends = friends

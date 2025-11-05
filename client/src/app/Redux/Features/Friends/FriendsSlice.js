@@ -27,6 +27,7 @@ const FriendsSlice = createSlice({
             s.results = a.payload.data.users;
         })
 
+
     }
 
 })

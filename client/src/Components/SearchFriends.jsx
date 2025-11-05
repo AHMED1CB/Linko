@@ -23,14 +23,13 @@ export default ({ open, setOpen }) => {
   const allUsers = useSelector((s) => s.friends.results);
 
   const [friends, setFriends] = useState(user.friends);
-  
+
   const [filteredUsers, setFilteredUsers] = useState([]);
 
   const handleAddFriend = async (usr) => {
     try {
-      await dispatch(sendRequest(usr._id)).unwrap();
-
       setFilteredUsers((prev) => prev.filter((u) => u._id !== usr._id));
+      await dispatch(sendRequest(usr._id)).unwrap();
     } catch (err) {
       console.error(err);
     }
@@ -64,7 +63,7 @@ export default ({ open, setOpen }) => {
     );
   }, [allUsers, friends, user.requests]);
 
-  return (
+  return (  
     <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="sm">
       <DialogTitle>Add Friend by Username</DialogTitle>
       <DialogContent>

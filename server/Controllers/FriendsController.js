@@ -12,7 +12,7 @@ export default class FriendsController {
         const currentId = req.user.id;
 
 
-        const isFriend = FriendsController.isFriend(req.body.id, targetFriendId);
+        const isFriend = FriendsController.isFriend(req.user.id, targetFriendId);
 
         if (!isFriend || targetFriendId == currentId) {
             return res.status(400).json({

@@ -40,3 +40,22 @@ export const searchForFriends = createAsyncThunk('friends/search', async (query,
     }
 
 })
+
+
+
+export const deleteFriend = createAsyncThunk('friends/delete', async (id, { rejectWithValue }) => {
+    try {
+
+        const response = await axios.delete(utils.server.paths.getRequestPath('friend', id), {
+            headers: {
+                Authorization: Cookie.get('authorization')
+            }
+        });
+
+
+        return response.data;
+    } catch (error) {
+        return rejectWithValue(error)
+    }
+
+})
