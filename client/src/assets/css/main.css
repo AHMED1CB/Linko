@@ -139,8 +139,9 @@ a:not(header a) {
 
 .img-msg {
   object-fit: cover;
-  width: 250px;
+  max-width: 250px;
   height: 250px;
+  max-width: 100%;
 }
 
 .text-wrap {

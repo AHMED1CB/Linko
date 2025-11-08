@@ -13,12 +13,15 @@ export default function VoiceMessage({ src }) {
   const theme = useTheme();
   useEffect(() => {
     const update = () => {
-      if (audio.duration) {
-        setProgress((audio.currentTime / audio.duration) * 100);
-        setCurrent(formatTime(audio.currentTime));
-      }
+      if (!audio.duration || isNaN(audio.duration)) return; 
+      setProgress((audio.currentTime / audio.duration) * 100);
+      setCurrent(formatTime(audio.currentTime));
     };
-    const load = () => setDuration(formatTime(audio.duration));
+
+    const load = () => {
+      if (!audio.duration || isNaN(audio.duration)) return;
+      setDuration(formatTime(audio.duration));
+    };
     const end = () => setIsPlaying(false);
 
     audio.addEventListener("timeupdate", update);
@@ -50,17 +53,14 @@ export default function VoiceMessage({ src }) {
       }
     }
   };
-
   const formatTime = (s) => {
-    if (!s) return "0:00";
+    if (!s || isNaN(s) || !isFinite(s)) return "0:00";
     const m = Math.floor(s / 60);
     const sec = Math.floor(s % 60)
       .toString()
       .padStart(2, "0");
-
     return `${m}:${sec}`;
   };
-
   return (
     <div className="voice-message">
       <IconButton onClick={toggle} size="small" className="voice-play-btn">

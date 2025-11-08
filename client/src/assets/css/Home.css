@@ -151,13 +151,15 @@
 }
 
 .message-bubble {
-  max-width: 60%;
+  max-width: 95%;
+  width: fit-content;
   height: fit-content;
   padding: 8px 16px;
   margin-bottom: 8px;
   border-radius: 18px;
   position: relative;
   height: fit-content;
+  overflow: hidden;
 }
 
 .message-bubble.incoming {
