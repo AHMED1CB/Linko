@@ -42,7 +42,7 @@ export default ({ open, setOpen }) => {
         return setFilteredUsers([]);
 
       try {
-        await dispatch(Converter.Username(search.trim())).unwrap();
+        await dispatch(search).unwrap();
       } catch (err) {
         console.error(err);
       }
@@ -75,7 +75,7 @@ export default ({ open, setOpen }) => {
           variant="outlined"
           size="small"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => setSearch(Converter.Username(e.target.value))}
           sx={{ mb: 2 }}
         />
 
