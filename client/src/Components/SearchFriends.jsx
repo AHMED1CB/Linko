@@ -15,6 +15,7 @@ import { useAuth } from "../app/Contexts/AuthContext";
 import { useDispatch, useSelector } from "react-redux";
 import { searchForFriends } from "../app/Redux/Features/Friends/FriendsServices";
 import { sendRequest } from "../app/Redux/Features/Requests/RequestsServices";
+import Converter from "../app/Helpers/TextConverter";
 
 export default ({ open, setOpen }) => {
   const [search, setSearch] = useState("");
@@ -37,7 +38,8 @@ export default ({ open, setOpen }) => {
 
   useEffect(() => {
     const fetchUsers = async () => {
-      if (search.trim().length === 0) return setFilteredUsers([]);
+      if (Converter.Username(search.trim()).length === 0)
+        return setFilteredUsers([]);
 
       try {
         await dispatch(searchForFriends(search)).unwrap();
@@ -63,7 +65,7 @@ export default ({ open, setOpen }) => {
     );
   }, [allUsers, friends, user.requests]);
 
-  return (  
+  return (
     <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="sm">
       <DialogTitle>Add Friend by Username</DialogTitle>
       <DialogContent>
