@@ -42,7 +42,7 @@ export default ({ open, setOpen }) => {
         return setFilteredUsers([]);
 
       try {
-        await dispatch(searchForFriends(search)).unwrap();
+        await dispatch(Converter.Username(search.trim())).unwrap();
       } catch (err) {
         console.error(err);
       }
