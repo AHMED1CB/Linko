@@ -42,7 +42,8 @@ export default ({ open, setOpen }) => {
         return setFilteredUsers([]);
 
       try {
-        await dispatch(search).unwrap();
+        console.log(search)
+        await dispatch(searchForFriends(search)).unwrap();
       } catch (err) {
         console.error(err);
       }
