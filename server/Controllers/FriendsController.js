@@ -95,6 +95,11 @@ export default class FriendsController {
             }
         })
     }
+
+    static async escapeRegex(str) {
+        return str.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+    }
+
     static async searchByUserName(req, res) {
         const { username } = req.params;
         const currentUserId = req.user.id;
@@ -108,7 +113,7 @@ export default class FriendsController {
             const userSentRequests = await Request.find({ from: req.user.id }).select("to");
             const excludedIds = userSentRequests.map(r => r.to.toString());
 
-            const regex = new RegExp(username, "i");
+            const regex = new RegExp(this.escapeRegex(username), "i");
             const users = await User.find({
                 username: { $regex: regex },
                 _id: { $ne: currentUserId, $nin: excludedIds },
